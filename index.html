@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>林道ファインダー — サポート</title>
+<meta name="description" content="走った人の情報が付いた林道地図。未舗装区間の色分け・通行止め/恒久封鎖の記録・出典と時点つき。オフラインで引ける同梱データ。">
+<style>
+  /* 配色はアプリ本体（surface.ts の3色＋アイコンの深緑）と同じトークン。
+     画面と地続きに見えることが、審査でも利用者にとっても信用になる */
+  :root{
+    --bg:#F2F6F1; --card:#FFFFFF; --ink:#16281E; --ink-soft:#5C6F63;
+    --accent:#E8590C; --paved:#1971C2; --unknown:#868E96; --closed:#C92A2A; --line:#DCE6DD;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E1A13; --card:#16281E; --ink:#E7F0E9; --ink-soft:#93A79A;
+      --accent:#F0752F; --paved:#4A9EE0; --unknown:#9AA4AD; --closed:#E05252; --line:#24382C;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",Roboto,sans-serif;
+    line-height:1.7;padding:24px 20px 64px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+
+  header{margin:20px 0 32px}
+  h1{font-size:36px;line-height:1.1;letter-spacing:-.5px;font-weight:800}
+  header p{margin-top:10px;font-size:17px;color:var(--ink-soft)}
+  .claim{display:inline-block;margin-top:16px;font-size:13px;font-weight:800;
+    letter-spacing:.4px;color:var(--accent);border:1.5px solid var(--accent);
+    border-radius:8px;padding:6px 11px}
+
+  h2{font-size:12px;letter-spacing:1.4px;color:var(--ink-soft);
+    margin:38px 0 12px;font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px;display:flex;gap:14px;align-items:stretch}
+  .card + .card{margin-top:10px}
+  /* 左端の色片はアプリの路面色そのまま: 未舗装/舗装/不明/封鎖 */
+  .pad{width:5px;border-radius:2.5px;flex:none;background:var(--line)}
+  .pad.dirt{background:var(--accent)} .pad.paved{background:var(--paved)}
+  .pad.unknown{background:var(--unknown)} .pad.closed{background:var(--closed)}
+  .body{flex:1}
+  .card h3{font-size:16px;margin-bottom:6px;letter-spacing:-.2px}
+  .card p,.card li{font-size:15px}
+  .card ul{padding-left:20px;margin-top:8px}
+  .card li{margin-top:4px}
+  .card p + p{margin-top:8px}
+  a{color:var(--paved);font-weight:600;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .muted{color:var(--ink-soft);font-size:13.5px}
+  footer{margin-top:44px;text-align:center;color:var(--ink-soft);font-size:13px}
+</style>
+<meta property="og:title" content="林道ファインダー — 走った人の情報が付いた林道地図">
+<meta property="og:description" content="未舗装区間の色分け・通行止め/恒久封鎖の記録・出典と時点つき。オフラインで引ける同梱データ。">
+<meta property="og:url" content="https://nosunosukawa.github.io/rindo-finder-site/">
+<meta property="og:type" content="website">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>林道ファインダー</h1>
+    <p>走った人の情報が付いた林道地図。どこがダートで、いつ誰が通れたか──
+       記録を出典と時点つきで引けます。</p>
+    <span class="claim">圏外でも引ける同梱データ</span>
+  </header>
+
+  <h2 id="about">できること</h2>
+  <div class="card">
+    <div class="pad dirt"></div>
+    <div class="body">
+      <h3>未舗装の見える地図</h3>
+      <p>林道の線形を地図に重ね、未舗装・舗装・路面不明を色分け。
+         通行止めや恒久封鎖はバッジで先に分かります。</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="pad paved"></div>
+    <div class="body">
+      <h3>走った人の記録</h3>
+      <p>公開されている走行記録から「いつ・通れたか・路面はどうだったか」を
+         事実だけ抜き出し、時系列で表示。公的な台帳値・規制情報がある路線はそれも併記します。</p>
+      <p class="muted">バイク向けに二輪の可否を優先表示。四輪の情報も消しません。</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="pad unknown"></div>
+    <div class="body">
+      <h3>名前のない道も捨てない</h3>
+      <p>記事に名前が書かれていない走行記録は「地域」ページに市町村・ランドマークつきで
+         そのまま載せています。地図に出ないだけで、情報は残っています。</p>
+    </div>
+  </div>
+
+  <h2 id="support">サポート</h2>
+  <div class="card">
+    <div class="pad dirt"></div>
+    <div class="body">
+      <h3>連絡先</h3>
+      <p>不具合の報告・情報の訂正はこちらへ:
+         <a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a></p>
+      <p class="muted">個人開発です。全部読みます。返信は1〜2日いただくことがあります。
+         「この林道の情報が違う」という指摘は、路線名とおおよその場所を添えてもらえると助かります。</p>
+    </div>
+  </div>
+
+  <h2 id="disclaimer">大事な注意</h2>
+  <div class="card">
+    <div class="pad closed"></div>
+    <div class="body">
+      <h3>通行可否は日々変わります</h3>
+      <p>このアプリの情報は「過去のある時点の記録」です。現在通れることを保証しません。
+         各情報に付いている「◯年◯月時点」を必ず確認し、走行前に管理者の公式情報を確認してください。</p>
+      <p class="muted">出典のページは消えたり内容が変わったりすることがあります。</p>
+    </div>
+  </div>
+
+  <h2 id="data">データについて</h2>
+  <div class="card">
+    <div class="pad paved"></div>
+    <div class="body">
+      <h3>出典とライセンス</h3>
+      <ul>
+        <li>林道の線形・路面: © OpenStreetMap contributors（ODbL 1.0）</li>
+        <li>福井県の林道線形: 福井県 林道路網データ（CC BY 4.0）</li>
+        <li>台帳値・規制: 各都道府県・市町村の公開情報（アプリ内に一覧）</li>
+        <li>走行記録: 公開ブログ等から事実のみ抽出（各画面に出典と時点を表示）</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="privacy">プライバシー</h2>
+  <div class="card">
+    <div class="pad unknown"></div>
+    <div class="body">
+      <h3>何も集めません</h3>
+      <p>アカウント登録なし・解析なし・広告なし・サーバーなし。
+         詳しくは<a href="privacy.html">プライバシーポリシー</a>へ。</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>林道ファインダー — 個人開発</p>
+  </footer>
+</div>
+</body>
+</html>

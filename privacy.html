@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>林道ファインダー — プライバシーポリシー</title>
+<meta name="description" content="林道ファインダーは何も収集しません。アカウントなし・解析なし・広告なし・サーバーなし。">
+<style>
+  /* index.html と同じトークン */
+  :root{
+    --bg:#F2F6F1; --card:#FFFFFF; --ink:#16281E; --ink-soft:#5C6F63;
+    --accent:#E8590C; --paved:#1971C2; --line:#DCE6DD;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E1A13; --card:#16281E; --ink:#E7F0E9; --ink-soft:#93A79A;
+      --accent:#F0752F; --paved:#4A9EE0; --line:#24382C;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",Roboto,sans-serif;
+    line-height:1.7;padding:24px 20px 64px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+  header{margin:20px 0 30px}
+  h1{font-size:28px;line-height:1.2;letter-spacing:-.4px;font-weight:800}
+  .lead{margin-top:14px;font-size:18px;line-height:1.5;font-weight:600}
+  .date{margin-top:10px;font-size:13px;color:var(--ink-soft)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px;display:flex;gap:14px;align-items:stretch}
+  .card + .card{margin-top:10px}
+  .pad{width:5px;border-radius:2.5px;flex:none;background:var(--accent)}
+  .body{flex:1}
+  .card h2{font-size:16px;margin-bottom:6px;letter-spacing:-.2px}
+  .card p{font-size:15px}
+  .card p + p{margin-top:8px}
+  a{color:var(--paved);font-weight:600;text-decoration:none}
+  a:hover{text-decoration:underline}
+  footer{margin-top:44px;text-align:center;color:var(--ink-soft);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>林道ファインダー プライバシーポリシー</h1>
+    <p class="lead">何も収集しません。</p>
+    <p class="date">2026年8月12日制定</p>
+  </header>
+
+  <div class="card">
+    <div class="pad"></div>
+    <div class="body">
+      <h2>収集するデータ: なし</h2>
+      <p>アカウント登録はありません。氏名・メールアドレス・位置情報・端末情報を含め、
+         いかなる個人情報も収集・送信しません。</p>
+      <p>解析ツール（アクセス解析・クラッシュレポート）や広告SDKは入っていません。
+         開発者のサーバーも存在しません。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="pad"></div>
+    <div class="body">
+      <h2>通信について</h2>
+      <p>林道のデータ（線形・観測・出典）はすべてアプリに同梱されており、表示に通信は使いません。
+         地図の背景タイルの表示にのみ、Apple マップ（MapKit）が Apple のサーバーと通信します。
+         この通信は Apple のプライバシーポリシーに従います。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="pad"></div>
+    <div class="body">
+      <h2>お問い合わせ</h2>
+      <p>本ポリシーに関する質問は
+         <a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a> へ。</p>
+    </div>
+  </div>
+
+  <footer>
+    <p><a href="index.html">林道ファインダー サポートへ戻る</a></p>
+  </footer>
+</div>
+</body>
+</html>
