@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>林道は全国に何kmある？ 都道府県別ランキング【統計×地図の実測】</title>
+<meta name="description" content="林野庁の統計（既設林道の現況）と OpenStreetMap の実測で数える、都道府県別の林道の総延長・本数・未舗装本数ランキング。統計に載っていても地図に線が無い林道が半分近くある、という話も。">
+<style>
+  /* 配色はトップページ（index.html）と同じトークン */
+  :root{
+    --bg:#F2F6F1; --card:#FFFFFF; --ink:#16281E; --ink-soft:#5C6F63;
+    --accent:#E8590C; --paved:#1971C2; --unknown:#868E96; --closed:#C92A2A; --line:#DCE6DD;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E1A13; --card:#16281E; --ink:#E7F0E9; --ink-soft:#93A79A;
+      --accent:#F0752F; --paved:#4A9EE0; --unknown:#9AA4AD; --closed:#E05252; --line:#24382C;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",Roboto,sans-serif;
+    line-height:1.8;padding:24px 20px 64px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+  header{margin:20px 0 8px}
+  .crumb{font-size:13.5px}
+  h1{font-size:28px;line-height:1.3;letter-spacing:-.4px;font-weight:800;margin-top:10px}
+  .meta{margin-top:8px;font-size:13.5px;color:var(--ink-soft)}
+  h2{font-size:19px;font-weight:800;letter-spacing:-.2px;margin:40px 0 10px}
+  p + p{margin-top:10px}
+  .lead{margin-top:18px;font-size:16.5px}
+  a{color:var(--paved);font-weight:600;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .muted{color:var(--ink-soft);font-size:13.5px;margin-top:10px}
+  .scroll{overflow-x:auto;margin-top:14px;-webkit-overflow-scrolling:touch;
+    border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  table{border-collapse:collapse;min-width:100%;font-size:14.5px;white-space:nowrap}
+  th,td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--line)}
+  thead th{position:sticky;top:0;background:var(--card);font-size:12.5px;
+    color:var(--ink-soft);vertical-align:bottom}
+  tbody th,thead th:nth-child(2){text-align:left}
+  tfoot th{text-align:left}
+  tfoot td,tfoot th{font-weight:800;border-bottom:none;border-top:2px solid var(--line)}
+  td.rank{color:var(--ink-soft);font-size:12.5px}
+  .unit{font-weight:400;font-size:11px}
+  .hint{margin-top:8px;font-size:12.5px;color:var(--ink-soft)}
+  @media (min-width:700px){ .hint{display:none} }
+  @media (max-width:560px){ table{font-size:13px} th,td{padding:6px 9px} }
+  .cta{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;margin-top:40px}
+  .cta h2{margin:0 0 8px;font-size:16px}
+  .cta p{font-size:14.5px}
+  footer{margin-top:44px;text-align:center;color:var(--ink-soft);font-size:13px}
+  footer p + p{margin-top:6px}
+</style>
+<meta property="og:title" content="林道は全国に何kmある？ 都道府県別ランキング">
+<meta property="og:description" content="林野庁の統計と OpenStreetMap の実測で数える、都道府県別の林道の総延長・本数・未舗装本数。">
+<meta property="og:url" content="https://nosunosukawa.github.io/rindo-finder-site/rindo-ranking.html">
+<meta property="og:type" content="article">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="crumb"><a href="index.html">林道ファインダー</a> › ガイド</p>
+    <h1>林道は全国に何kmある？<br>都道府県別ランキング</h1>
+    <p class="meta">林野庁の統計（既設林道の現況・令和5年度末）と、OpenStreetMap の実測を突き合わせて数えました。</p>
+  </header>
+
+  <!-- data:start（node make-ranking.mjs が生成。手で直さない） -->
+  <p class="lead">全国の林道の総延長は<strong>約14万km</strong>
+  （林野庁の統計・令和5年度末）。うち約4.6万kmが国有林の林道です。
+  一方、地図（OpenStreetMap）に線として引かれている林道は全国で
+  <strong>35,164本</strong>、うち未舗装と記録されているのは
+  4,066本にとどまります。</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th></th><th>都道府県</th>
+          <th>公式延長<br><span class="unit">km</span></th>
+          <th>地図で引ける延長<br><span class="unit">km ※</span></th>
+          <th>地図上の本数</th><th>うち未舗装</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td class="rank">1</td><th scope="row">北海道</th>
+        <td>24,114</td><td>20,619</td>
+        <td>9,045</td><td>2,767</td>
+      </tr>
+      <tr>
+        <td class="rank">2</td><th scope="row">長野県</th>
+        <td>7,208</td><td>4,027</td>
+        <td>2,644</td><td>185</td>
+      </tr>
+      <tr>
+        <td class="rank">3</td><th scope="row">岐阜県</th>
+        <td>6,113</td><td>1,559</td>
+        <td>978</td><td>15</td>
+      </tr>
+      <tr>
+        <td class="rank">4</td><th scope="row">岩手県</th>
+        <td>5,982</td><td>1,943</td>
+        <td>860</td><td>7</td>
+      </tr>
+      <tr>
+        <td class="rank">5</td><th scope="row">福島県</th>
+        <td>5,849</td><td>3,265</td>
+        <td>2,284</td><td>46</td>
+      </tr>
+      <tr>
+        <td class="rank">6</td><th scope="row">秋田県</th>
+        <td>5,366</td><td>2,361</td>
+        <td>1,080</td><td>30</td>
+      </tr>
+      <tr>
+        <td class="rank">7</td><th scope="row">宮崎県</th>
+        <td>4,730</td><td>1,973</td>
+        <td>576</td><td>0</td>
+      </tr>
+      <tr>
+        <td class="rank">8</td><th scope="row">青森県</th>
+        <td>4,216</td><td>2,712</td>
+        <td>1,675</td><td>91</td>
+      </tr>
+      <tr>
+        <td class="rank">9</td><th scope="row">鹿児島県</th>
+        <td>4,199</td><td>1,571</td>
+        <td>548</td><td>14</td>
+      </tr>
+      <tr>
+        <td class="rank">10</td><th scope="row">高知県</th>
+        <td>4,173</td><td>1,691</td>
+        <td>764</td><td>34</td>
+      </tr>
+      <tr>
+        <td class="rank">11</td><th scope="row">新潟県</th>
+        <td>3,541</td><td>1,580</td>
+        <td>979</td><td>14</td>
+      </tr>
+      <tr>
+        <td class="rank">12</td><th scope="row">静岡県</th>
+        <td>3,535</td><td>1,900</td>
+        <td>1,308</td><td>195</td>
+      </tr>
+      <tr>
+        <td class="rank">13</td><th scope="row">山形県</th>
+        <td>3,110</td><td>1,325</td>
+        <td>776</td><td>14</td>
+      </tr>
+      <tr>
+        <td class="rank">14</td><th scope="row">熊本県</th>
+        <td>3,109</td><td>1,177</td>
+        <td>608</td><td>1</td>
+      </tr>
+      <tr>
+        <td class="rank">15</td><th scope="row">広島県</th>
+        <td>3,053</td><td>470</td>
+        <td>293</td><td>15</td>
+      </tr>
+      <tr>
+        <td class="rank">16</td><th scope="row">愛媛県</th>
+        <td>2,917</td><td>450</td>
+        <td>318</td><td>10</td>
+      </tr>
+      <tr>
+        <td class="rank">17</td><th scope="row">群馬県</th>
+        <td>2,561</td><td>2,136</td>
+        <td>1,604</td><td>65</td>
+      </tr>
+      <tr>
+        <td class="rank">18</td><th scope="row">大分県</th>
+        <td>2,431</td><td>491</td>
+        <td>174</td><td>2</td>
+      </tr>
+      <tr>
+        <td class="rank">19</td><th scope="row">岡山県</th>
+        <td>2,322</td><td>216</td>
+        <td>84</td><td>0</td>
+      </tr>
+      <tr>
+        <td class="rank">20</td><th scope="row">福井県</th>
+        <td>2,242</td><td>700</td>
+        <td>498</td><td>104</td>
+      </tr>
+      <tr>
+        <td class="rank">21</td><th scope="row">宮城県</th>
+        <td>2,230</td><td>624</td>
+        <td>228</td><td>0</td>
+      </tr>
+      <tr>
+        <td class="rank">22</td><th scope="row">山梨県</th>
+        <td>2,192</td><td>1,047</td>
+        <td>930</td><td>47</td>
+      </tr>
+      <tr>
+        <td class="rank">23</td><th scope="row">三重県</th>
+        <td>2,180</td><td>260</td>
+        <td>149</td><td>5</td>
+      </tr>
+      <tr>
+        <td class="rank">24</td><th scope="row">石川県</th>
+        <td>2,101</td><td>101</td>
+        <td>47</td><td>0</td>
+      </tr>
+      <tr>
+        <td class="rank">25</td><th scope="row">栃木県</th>
+        <td>2,038</td><td>1,237</td>
+        <td>1,099</td><td>2</td>
+      </tr>
+      <tr>
+        <td class="rank">26</td><th scope="row">和歌山県</th>
+        <td>2,007</td><td>214</td>
+        <td>149</td><td>2</td>
+      </tr>
+      <tr>
+        <td class="rank">27</td><th scope="row">徳島県</th>
+        <td>1,996</td><td>194</td>
+        <td>228</td><td>10</td>
+      </tr>
+      <tr>
+        <td class="rank">28</td><th scope="row">山口県</th>
+        <td>1,975</td><td>136</td>
+        <td>93</td><td>4</td>
+      </tr>
+      <tr>
+        <td class="rank">29</td><th scope="row">島根県</th>
+        <td>1,961</td><td>514</td>
+        <td>354</td><td>3</td>
+      </tr>
+      <tr>
+        <td class="rank">30</td><th scope="row">福岡県</th>
+        <td>1,953</td><td>390</td>
+        <td>222</td><td>3</td>
+      </tr>
+      <tr>
+        <td class="rank">31</td><th scope="row">兵庫県</th>
+        <td>1,882</td><td>258</td>
+        <td>100</td><td>4</td>
+      </tr>
+      <tr>
+        <td class="rank">32</td><th scope="row">富山県</th>
+        <td>1,812</td><td>229</td>
+        <td>272</td><td>1</td>
+      </tr>
+      <tr>
+        <td class="rank">33</td><th scope="row">愛知県</th>
+        <td>1,713</td><td>621</td>
+        <td>518</td><td>35</td>
+      </tr>
+      <tr>
+        <td class="rank">34</td><th scope="row">京都府</th>
+        <td>1,567</td><td>246</td>
+        <td>191</td><td>20</td>
+      </tr>
+      <tr>
+        <td class="rank">35</td><th scope="row">長崎県</th>
+        <td>1,558</td><td>185</td>
+        <td>82</td><td>2</td>
+      </tr>
+      <tr>
+        <td class="rank">36</td><th scope="row">鳥取県</th>
+        <td>1,408</td><td>469</td>
+        <td>258</td><td>8</td>
+      </tr>
+      <tr>
+        <td class="rank">37</td><th scope="row">佐賀県</th>
+        <td>1,349</td><td>198</td>
+        <td>83</td><td>8</td>
+      </tr>
+      <tr>
+        <td class="rank">38</td><th scope="row">滋賀県</th>
+        <td>1,278</td><td>135</td>
+        <td>83</td><td>5</td>
+      </tr>
+      <tr>
+        <td class="rank">39</td><th scope="row">茨城県</th>
+        <td>1,216</td><td>657</td>
+        <td>403</td><td>10</td>
+      </tr>
+      <tr>
+        <td class="rank">40</td><th scope="row">奈良県</th>
+        <td>1,092</td><td>258</td>
+        <td>223</td><td>0</td>
+      </tr>
+      <tr>
+        <td class="rank">41</td><th scope="row">埼玉県</th>
+        <td>903</td><td>573</td>
+        <td>699</td><td>20</td>
+      </tr>
+      <tr>
+        <td class="rank">42</td><th scope="row">神奈川県</th>
+        <td>683</td><td>374</td>
+        <td>360</td><td>44</td>
+      </tr>
+      <tr>
+        <td class="rank">43</td><th scope="row">千葉県</th>
+        <td>669</td><td>326</td>
+        <td>389</td><td>34</td>
+      </tr>
+      <tr>
+        <td class="rank">44</td><th scope="row">東京都</th>
+        <td>498</td><td>365</td>
+        <td>610</td><td>187</td>
+      </tr>
+      <tr>
+        <td class="rank">45</td><th scope="row">香川県</th>
+        <td>465</td><td>28</td>
+        <td>7</td><td>0</td>
+      </tr>
+      <tr>
+        <td class="rank">46</td><th scope="row">大阪府</th>
+        <td>393</td><td>86</td>
+        <td>115</td><td>3</td>
+      </tr>
+      <tr>
+        <td class="rank">47</td><th scope="row">沖縄県</th>
+        <td>300</td><td>169</td>
+        <td>176</td><td>0</td>
+      </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td></td><th scope="row">全国</th>
+          <td>140,190</td><td>62,060</td>
+          <td>35,164</td><td>4,066</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <p class="hint">表は横にスワイプできます &rarr;</p>
+  <p class="muted">公式延長: 令和5年度末（林野庁 森林・林業統計要覧2025 表18 既設林道の現況）。国有林の林道を含む。<br>
+     ※「地図で引ける延長」はアプリ同梱データ（OpenStreetMap＋林野庁 国有林GIS。
+     両方に線がある区間の重複を除いた推定値）。本数・未舗装は OpenStreetMap の実測。</p>
+  <!-- data:end -->
+
+  <h2>どう読むか</h2>
+  <p>1位の北海道が圧倒的で、公式延長は2位以下を大きく引き離します。国有林の面積が
+     大きい道県（北海道・東北）は「公式延長」に占める国有林林道の割合も高く、
+     名前のついた路線が多いのが特徴です。一方、近畿・四国の山深い県は、
+     延長そのものより<strong>未舗装で残っている本数</strong>が多く、
+     ダート目当てのツーリングではランキングの順位と「走って楽しい県」は一致しません。</p>
+  <p>「地図上の本数」は OpenStreetMap で林道として引かれている線の数です。
+     台帳上は1本の林道が地図では枝ごとに分かれて数えられることがあるため、
+     公式の「路線数」とは定義が異なります。</p>
+
+  <h2>統計にあるのに、地図に無い林道</h2>
+  <p>表の「公式延長」と「地図で引ける延長」を比べると、全国では
+     <strong>統計に載っている林道のうち、地図に線として存在するのは半分に届きません</strong>。
+     林野庁の統計は都道府県から報告された台帳の集計で、実在する林道の延長としては
+     最も信頼できる数字ですが、台帳には座標がありません。地図側
+     （OpenStreetMap や市販の地図アプリ）は誰かが実際に線を引いた場所しか
+     表示できないので、「統計には存在するのに、どの地図にも載っていない林道」が
+     大量に残っています。</p>
+  <p>つまり「地図アプリで見えている林道が全て」ではありません。国有林の林道は
+     林野庁がGISデータ（線形つき）を公開しているため比較的よく埋まっていますが、
+     民有林の林道は都道府県によって公開状況が大きく違います。この「地図で引ける割合」の
+     県ごとの差は、<a href="index.html">林道ファインダー</a>の収録状況画面でも
+     確認できます。</p>
+
+  <h2>走りに行く前に確認すること</h2>
+  <p>林道は災害や工事で頻繁に通行止めになります。管理者（市町村・都道府県・森林管理署）が
+     公表している規制情報を出発前に確認してください。現地ではゲート・標識・管理者の指示が
+     常に優先します。</p>
+
+  <div class="cta">
+    <h2>このデータを地図で引けるアプリ</h2>
+    <p>この記事の数値は、iOS アプリ<a href="index.html">「林道ファインダー」</a>に
+       同梱しているデータそのものから生成しています。アプリでは全国の林道の線形を
+       未舗装・舗装で色分けし、自治体・林野庁が公表している通行止めと台帳の値を
+       出典と日付つきで路線ごとに表示します。圏外でも引けます。</p>
+  </div>
+
+  <h2>出典とライセンス</h2>
+  <p class="muted">公式延長: 林野庁「森林・林業統計要覧2025」表18 既設林道の現況（令和5年度末）。<br>
+     地図上の本数・未舗装本数・線形: © OpenStreetMap contributors（ODbL 1.0）。<br>
+     国有林の線形: 林野庁 国有林GISデータ（公共データ利用規約 第1.0版）。<br>
+     数値は手打ちではなく、アプリ同梱データの正本から <code>make-ranking.mjs</code> で生成しています。</p>
+
+  <footer>
+    <p><a href="index.html">林道ファインダー</a> — 個人開発</p>
+    <p><a href="privacy.html">プライバシーポリシー</a></p>
+  </footer>
+</div>
+</body>
+</html>
