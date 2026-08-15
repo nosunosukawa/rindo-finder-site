@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nosunosukawa.github.io/rindo-finder-site/sitemap.xml
