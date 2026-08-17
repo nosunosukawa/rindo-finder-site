@@ -6,76 +6,80 @@
 <title>林道ファインダー — プライバシーポリシー</title>
 <meta name="description" content="林道ファインダーは何も収集しません。アカウントなし・解析なし・広告なし・サーバーなし。現在地は端末内でのみ使用します。">
 <style>
-  /* index.html と同じトークン（アプリ本体 theme.ts が正本）。外部リソースは使わない */
+  /* index.html / support.html と同じトークン。法的な本文は1文字も変えていない（意匠だけ追従） */
   :root{
-    --bg:#F4F1EA; --paper:#FFFFFF; --sunk:#EDE9E0;
-    --ink:#1C1915; --body:#45403A; --mute:#6E6659; --faint:#736B60;
-    --line:#DFD8CB; --topo:rgba(28,25,21,.055);
-    --dirt:#B04106; --dirt-mark:#E8590C; --dirt-bg:#FBEDE2;
-    --action:#175FA8;
-    --shadow:0 1px 2px rgba(28,25,21,.05), 0 8px 24px -16px rgba(28,25,21,.35);
+    --terrain:#E2F0D7; --terrain-deep:#CBDDBB; --paper:#FFFFFF;
+    --ink:#1C1915; --body:#45403A; --mute:#5E574E;
+    --dirt:#E8590C; --dirt-ink:#983E08; --focus:#983E08;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#14120F; --paper:#1D1A16; --sunk:#241F1A;
-      --ink:#F2EDE4; --body:#D3CCC0; --mute:#A79E90; --faint:#8E8578;
-      --line:#332C24; --topo:rgba(242,237,228,.05);
-      --dirt:#F2833F; --dirt-mark:#E8590C; --dirt-bg:#2A1B10;
-      --action:#7FB3E8;
-      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+      --terrain:#16200F; --terrain-deep:#24331A; --paper:#14120E;
+      --ink:#F2EEE7; --body:#D6CFC4; --mute:#B6ADA0;
+      --dirt:#E86A1F; --dirt-ink:#FFB183; --focus:#FFB183;
     }
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;color-scheme:light dark}
   body{
-    background:var(--bg);color:var(--body);
-    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,sans-serif;
-    font-size:15.5px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-wrap:break-word;
+    background:var(--terrain);color:var(--body);
+    font-family:"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
+    font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-wrap:break-word;
+    text-wrap:pretty;touch-action:manipulation;-webkit-tap-highlight-color:rgba(232,89,12,.18);
   }
-  body::before{
-    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background-image:
-      repeating-radial-gradient(ellipse 780px 460px at 14% 8%, transparent 0 27px, var(--topo) 27px 28px),
-      repeating-radial-gradient(ellipse 620px 820px at 88% 62%, transparent 0 33px, var(--topo) 33px 34px);
+  .wrap{max-width:40em;margin:0 auto;
+        padding-left:max(16px, env(safe-area-inset-left));
+        padding-right:max(16px, env(safe-area-inset-right));
+        padding-bottom:max(60px, env(safe-area-inset-bottom))}
+  a{color:var(--dirt-ink);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+  a:hover{text-decoration-thickness:2px}
+  :focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:2px}
+
+  h1,h2,.brand{
+    font-family:"Avenir Next Condensed","Toppan Bunkyu Midashi Gothic","Hiragino Sans",
+                "Hiragino Kaku Gothic ProN",system-ui,sans-serif;
+    font-weight:700;color:var(--ink);letter-spacing:-.01em;
+    word-break:auto-phrase;line-break:strict;
   }
-  .wrap{max-width:680px;margin:0 auto;padding:0 18px 72px}
-  a{color:var(--action);font-weight:600;text-decoration:none}
-  a:hover{text-decoration:underline}
-  :focus-visible{outline:2.5px solid var(--dirt-mark);outline-offset:2.5px;border-radius:3px}
+  .util{display:flex;flex-wrap:wrap;gap:0 18px;align-items:center;background:var(--terrain-deep);
+        margin-left:calc(-1 * max(16px, env(safe-area-inset-left)));
+        margin-right:calc(-1 * max(16px, env(safe-area-inset-right)));
+        padding-left:max(16px, env(safe-area-inset-left));
+        padding-right:max(16px, env(safe-area-inset-right))}
+  .util .brand{font-size:15px;margin-right:auto;padding:10px 0}
+  .util a{display:inline-flex;align-items:center;min-height:44px;font-size:14px}
 
-  .util{display:flex;flex-wrap:wrap;gap:0 14px;align-items:baseline;padding:2px 0 0;font-size:13px}
-  .util .brand{font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-right:auto;padding:10px 0}
-  .util a{font-weight:700;display:inline-block;padding:10px 0}
-
-  header{padding:26px 0 22px}
-  .eyebrow-app{font-size:11.5px;font-weight:800;letter-spacing:1.2px;color:var(--dirt);margin-bottom:9px}
-  h1{font-size:28px;line-height:1.25;letter-spacing:-.6px;font-weight:800;color:var(--ink)}
+  header{padding:26px 0 18px}
+  .eyebrow-app{font-family:"SF Mono",Menlo,ui-monospace,monospace;
+               font-size:11.5px;font-weight:600;letter-spacing:.1em;color:var(--dirt-ink);margin-bottom:10px}
+  h1{font-size:28px;line-height:1.25}
   .lead{margin-top:14px;font-size:19px;line-height:1.5;font-weight:700;color:var(--ink)}
-  .date{margin-top:10px;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
+  .date{margin-top:10px;font-family:"SF Mono",Menlo,ui-monospace,monospace;
+        font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
 
-  .panel{
-    background:var(--paper);border:1px solid var(--line);border-radius:12px;
-    padding:18px;box-shadow:var(--shadow);
-  }
-  .panel + .panel{margin-top:12px}
-  .panel h2{
-    font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.3px;
-    line-height:1.5;margin-bottom:8px;
-    padding-left:11px;border-left:3px solid var(--dirt-mark);
-  }
-  .panel p{font-size:15px}
-  .panel p + p{margin-top:9px}
+  .panel{background:var(--paper);padding:18px}
+  .panel + .panel{margin-top:10px}
+  .panel h2{font-size:17px;line-height:1.5;margin-bottom:8px;
+            padding-left:11px;border-left:4px solid var(--dirt)}
+  .panel p{font-size:15.5px}
+  .panel p a{display:inline-flex;align-items:center;min-height:44px}
+  .panel p + p{margin-top:10px}
   strong{color:var(--ink);font-weight:700}
 
-  footer{
-    margin-top:44px;padding-top:12px;border-top:1px solid var(--line);
-    text-align:center;font-size:13px;color:var(--mute);
-  }
-  footer a{display:inline-block;padding:10px 0}
+  footer{margin-top:36px;background:var(--terrain-deep);
+         margin-left:calc(-1 * max(16px, env(safe-area-inset-left)));
+         margin-right:calc(-1 * max(16px, env(safe-area-inset-right)));
+         padding:4px max(16px, env(safe-area-inset-right)) 18px max(16px, env(safe-area-inset-left));
+         font-size:14px}
+  footer a{display:inline-flex;align-items:center;min-height:44px}
+  @media (min-width:720px){ body{font-size:17px} h1{font-size:38px} }
   @media (prefers-reduced-motion: reduce){
-    *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto !important}
   }
 </style>
+<meta name="theme-color" content="#E2F0D7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16200F" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="https://nosunosukawa.github.io/rindo-finder-site/privacy.html">
 </head>
 <body>
@@ -83,8 +87,8 @@
 
   <nav class="util" aria-label="サイト内">
     <span class="brand">林道ファインダー</span>
-    <a href="index.html">サポート</a>
-    <a href="index.html#support">連絡先</a>
+    <a href="index.html">トップ</a>
+    <a href="support.html">サポート</a>
   </nav>
 
   <header>
@@ -130,7 +134,7 @@
   </div>
 
   <footer>
-    <p><a href="index.html">林道ファインダー サポートへ戻る</a></p>
+    <p><a href="support.html">林道ファインダー サポートへ戻る</a></p>
   </footer>
 </div>
 </body>

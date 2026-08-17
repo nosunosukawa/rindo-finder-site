@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 358 250" width="358" height="250" role="img" aria-label="収録の層と本数。国有林のGIS 12,381、うち 林道名がある 12,381、県の林道台帳（名前あり） 4,914、うち 延長か幅員の値がある 1,997、自治体の公表ページ 1,707、うち 規制情報が読める 323、うち 公式台帳の値がある 132。">
+<title>収録の層と本数。国有林のGIS 12,381、うち 林道名がある 12,381、県の林道台帳（名前あり） 4,914、うち 延長か幅員の値がある 1,997、自治体の公表ページ 1,707、うち 規制情報が読める 323、うち 公式台帳の値がある 132。</title>
+<style>
+  :root{
+    --surface:#FFFFFF; --ink:#1C1915; --mute:#5E574E;
+    --dirt:#E8590C; --ref:#983E08; --grid:#D8E4CC;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --surface:#14120E; --ink:#F2EEE7; --mute:#B6ADA0;
+      --dirt:#E86A1F; --ref:#FFB183; --grid:#2E4022;
+    }
+  }
+  .bg{fill:var(--surface)}
+  .bar{fill:var(--dirt)}
+  .grid{stroke:var(--grid);stroke-width:1}
+  .ref{stroke:var(--ref);stroke-width:1.5;stroke-dasharray:4 3}
+  text{font-family:"SF Mono",Menlo,"Hiragino Sans","Hiragino Kaku Gothic ProN",ui-monospace,monospace;
+       font-variant-numeric:tabular-nums}
+  .lbl{fill:var(--ink);font-size:11px}
+  .val{fill:var(--mute);font-size:11px}
+  .axis{fill:var(--mute);font-size:10px;letter-spacing:.08em}
+  .reflbl{fill:var(--ref);font-size:10px;font-weight:600}
+</style>
+<rect class="bg" x="0" y="0" width="358" height="250"/>
+<text class="lbl" x="0" y="17">国有林のGIS</text>
+<text class="val" x="355" y="17" text-anchor="end">12,381</text>
+<rect class="bar" x="0" y="23" width="355.0" height="8" rx="1.5"/>
+<text class="lbl" x="12" y="51">└ うち 林道名がある</text>
+<text class="val" x="355" y="51" text-anchor="end">12,381</text>
+<rect class="bar" x="12" y="57" width="343.0" height="8" rx="1.5"/>
+<text class="lbl" x="0" y="85">県の林道台帳（名前あり）</text>
+<text class="val" x="355" y="85" text-anchor="end">4,914</text>
+<rect class="bar" x="0" y="91" width="140.9" height="8" rx="1.5"/>
+<text class="lbl" x="12" y="119">└ うち 延長か幅員の値がある</text>
+<text class="val" x="355" y="119" text-anchor="end">1,997</text>
+<rect class="bar" x="12" y="125" width="55.3" height="8" rx="1.5"/>
+<text class="lbl" x="0" y="153">自治体の公表ページ</text>
+<text class="val" x="355" y="153" text-anchor="end">1,707</text>
+<rect class="bar" x="0" y="159" width="48.9" height="8" rx="1.5"/>
+<text class="lbl" x="12" y="187">└ うち 規制情報が読める</text>
+<text class="val" x="355" y="187" text-anchor="end">323</text>
+<rect class="bar" x="12" y="193" width="8.9" height="8" rx="1.5"/>
+<text class="lbl" x="12" y="221">└ うち 公式台帳の値がある</text>
+<text class="val" x="355" y="221" text-anchor="end">132</text>
+<rect class="bar" x="12" y="227" width="3.7" height="8" rx="1.5"/>
+</svg>

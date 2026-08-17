@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>林道ファインダー サポート — 使い方・出典・免責・よくある質問</title>
+<meta name="description" content="林道ファインダーのサポート。収録データの内訳と出どころ、47都道府県の被覆率、オフラインの範囲、購入と復元、免責事項、出典とライセンス、よくある質問。">
+<style>
+  /* 意匠は index.html と同じトークン。こちらは文字を読むためのページなので図は最小限。 */
+  :root{
+    --terrain:#E2F0D7; --terrain-deep:#CBDDBB; --paper:#FFFFFF;
+    --ink:#1C1915; --body:#45403A; --mute:#5E574E;
+    --dirt:#E8590C; --dirt-ink:#983E08;
+    --edge:#8C9C7C; --focus:#983E08;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --terrain:#16200F; --terrain-deep:#24331A; --paper:#14120E;
+      --ink:#F2EEE7; --body:#D6CFC4; --mute:#B6ADA0;
+      --dirt:#E86A1F; --dirt-ink:#FFB183;
+      --edge:#6E7F5E; --focus:#FFB183;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;color-scheme:light dark}
+  body{
+    background:var(--terrain);color:var(--body);
+    font-family:"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
+    font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-wrap:break-word;
+    text-wrap:pretty;touch-action:manipulation;-webkit-tap-highlight-color:rgba(232,89,12,.18);
+  }
+  :focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:2px}
+  [id]{scroll-margin-top:16px}
+  h1,h2,h3,.brand{
+    font-family:"Avenir Next Condensed","Toppan Bunkyu Midashi Gothic","Hiragino Sans",
+                "Hiragino Kaku Gothic ProN",system-ui,sans-serif;
+    font-weight:700;color:var(--ink);letter-spacing:-.01em;
+    word-break:auto-phrase;line-break:strict;
+  }
+  a{color:var(--dirt-ink);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+  a:hover{text-decoration-thickness:2px}
+
+  .util,footer{background:var(--terrain-deep)}
+  .util{display:flex;flex-wrap:wrap;align-items:center;gap:0 18px;
+        padding-left:max(16px, env(safe-area-inset-left));
+        padding-right:max(16px, env(safe-area-inset-right))}
+  .brand{font-size:15px;margin-right:auto;padding:10px 0}
+  .util a,footer a{display:inline-flex;align-items:center;min-height:44px;font-size:14px}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{position:static;display:block;padding:10px 16px;background:var(--paper)}
+
+  .col{max-width:40em;margin:0 auto;
+       padding-left:max(16px, env(safe-area-inset-left));
+       padding-right:max(16px, env(safe-area-inset-right))}
+  h1{font-size:28px;line-height:1.25;margin:28px 0 8px}
+  .sub{color:var(--mute);font-size:14px;margin-bottom:8px}
+  section{padding:30px 0 4px}
+  h2{font-size:22px;line-height:1.35;margin:0 0 14px}
+  h3{font-size:16.5px;margin:22px 0 6px;color:var(--ink)}
+  p{margin-top:12px}
+  ul{margin:12px 0 0 1.15em}
+  li{margin-top:7px}
+  .note{font-size:13.5px;color:var(--mute);line-height:1.75}
+  /* 文中でない単独のリンクは 44px を確保する（文中のものは WCAG 2.2 の除外にあたる） */
+  .mail{font-family:"SF Mono",Menlo,ui-monospace,monospace;font-size:15px;word-break:break-all}
+  .mail a,.solo a{display:inline-flex;align-items:center;min-height:44px}
+
+  /* 表。横に溢れるものはキーボードでも動かせるようにする（2.1.1） */
+  .tablewrap{overflow-x:auto;overscroll-behavior:contain;background:var(--paper);
+             padding:4px 0;margin-top:14px}
+  .tablewrap:focus-visible{outline:2.5px solid var(--focus);outline-offset:0}
+  table{border-collapse:collapse;width:100%;min-width:430px;font-size:14px}
+  caption{text-align:left;font-size:13px;color:var(--mute);padding:10px 12px;line-height:1.7}
+  th,td{padding:8px 12px;text-align:left;vertical-align:top;
+        border-bottom:1px solid var(--terrain-deep)}
+  thead th{font-size:12px;color:var(--mute);font-weight:700;letter-spacing:.04em;white-space:nowrap}
+  tbody th{font-weight:600;color:var(--ink);white-space:nowrap}
+  td.n{font-family:"SF Mono",Menlo,ui-monospace,monospace;font-variant-numeric:tabular-nums;
+       text-align:right;white-space:nowrap;color:var(--ink)}
+  .indent th{padding-left:26px;font-weight:400;color:var(--body)}
+  .tall{max-height:520px;overflow-y:auto}
+  .tall thead th{position:sticky;top:0;background:var(--paper)}
+
+  /* 実データの引用ブロック。押せそうに見せない（青字にも矢印にもしない） */
+  .quote{background:var(--paper);padding:16px;margin-top:14px}
+  .quote .q{font-size:15px;color:var(--ink);line-height:1.85}
+  .quote .src{font-family:"SF Mono",Menlo,ui-monospace,monospace;font-size:12px;
+              color:var(--mute);margin-top:10px;line-height:1.7}
+
+  .warn{background:var(--paper);border-left:5px solid var(--dirt);padding:16px 16px 18px;margin-top:14px}
+  .warn h3{margin-top:0}
+
+  details{background:var(--paper);padding:0 14px;margin-top:10px}
+  summary{cursor:pointer;padding:14px 0;min-height:44px;display:flex;align-items:center;
+          font-weight:700;color:var(--ink);font-size:15.5px}
+  details p{margin:0 0 14px}
+
+  footer{margin-top:36px;
+         padding:6px max(16px, env(safe-area-inset-right)) max(26px, env(safe-area-inset-bottom))
+                   max(16px, env(safe-area-inset-left))}
+  footer .links{display:flex;flex-wrap:wrap;gap:0 18px}
+  footer .sig{font-size:12px;color:var(--mute);padding-top:6px}
+
+  @media (min-width:720px){
+    body{font-size:17px}
+    h1{font-size:40px}
+    h2{font-size:27px}
+    section{padding:44px 0 4px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto !important}
+  }
+</style>
+<meta name="theme-color" content="#E2F0D7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16200F" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://nosunosukawa.github.io/rindo-finder-site/support.html">
+</head>
+<body>
+<a class="skip" href="#main">本文へ</a>
+
+<nav class="util" aria-label="サイト内">
+  <span class="brand">林道ファインダー</span>
+  <a href="index.html">トップ</a>
+  <a href="privacy.html">プライバシー</a>
+</nav>
+
+<main id="main">
+<div class="col">
+  <h1>サポート</h1>
+  <p class="sub">iPhone アプリ「林道ファインダー」の詳しい説明・出典・免責・よくある質問。</p>
+  <p class="mail"><a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a></p>
+  <p class="note">個人開発です。全部読みます。返信は1〜2日いただくことがあります。</p>
+</div>
+
+<!-- ────────── 出典と日付 ────────── -->
+<section class="col" id="sources">
+  <h2>出典と日付の読み方</h2>
+  <p>
+    通行止めの情報は、市区町村・都道府県・観光協会・林野庁が公開しているページからの
+    <strong>逐語の引用</strong>です。アプリはそれを言い換えません。要約すると、
+    「いつの・どの区間の話か」が落ちるからです。
+  </p>
+  <p>
+    路線を開くと最初に出るのは「最も新しい公的情報が何年何月何日のもので、いま何日前か」。
+    トップページに出している図は、この日数を地図の縮尺バーと同じ形で測ったものです。
+  </p>
+
+  <div class="quote">
+    <p class="q">
+      「止め情報 更新日：2025年12月10日 ページID：1169 下記の路線は全面通行止めとなります。
+      御荷鉾スーパー林道 藤岡市保美濃山〜南牧村勧能 令和7年12月10日〜令和8年4月20日 …」
+    </p>
+    <p class="src">
+      出典 神流町「冬季通行止め情報」／ www.town.kanna.gunma.jp<br>
+      最新日 2026-04-20 ・ 取得日 2026-08-13 ・ 経過 115日<br>
+      （この枠はリンクではありません。出典URLはアプリの路線画面から開けます）
+    </p>
+  </div>
+
+  <h3>「規制の語」は、いまの状態ではありません</h3>
+  <p>
+    路線カードに並ぶ「通行止」「解除」「冬季閉鎖」「崩落」「ゲート」は、
+    <strong>出典ページに出てきた語</strong>です。解除と通行止が並ぶこともあります。
+    どちらが最新かは、下の根拠を日付とあわせて読んでください。
+  </p>
+
+  <h3>公式値と実測を、両方出します</h3>
+  <p>
+    県の台帳の値と OpenStreetMap の線形は、しばしば食い違います。
+    たとえば山梨県 林道南アルプス線は、公式の延長 19.206km・幅員 3.5〜5.0m に対して、
+    線形は 22.8km あります。アプリはどちらかに寄せず、<strong>両方を並べて出します</strong>。
+  </p>
+</section>
+
+<!-- ────────── 収録データ ────────── -->
+<section class="col" id="data">
+  <h2 id="data-h">収録データの内訳</h2>
+  <div class="tablewrap" role="region" aria-labelledby="data-h" tabindex="0">
+    <table>
+      <caption>2026年8月15日時点の同梱データ。本数は各データファイルの実数です。</caption>
+      <thead>
+        <tr><th scope="col">層</th><th scope="col">本数</th><th scope="col">出どころ</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">下地の線形</th><td class="n">35,164</td>
+          <td>OpenStreetMap（ODbL 1.0）／ 総延長 44,374km</td>
+        </tr>
+        <tr>
+          <th scope="row">国有林の路線</th><td class="n">12,381</td>
+          <td>林野庁 国有林GISデータ 2024年度版（公共データ利用規約 第1.0版）／ 全件に路線名あり</td>
+        </tr>
+        <tr>
+          <th scope="row">県の林道台帳（名前あり）</th><td class="n">4,914</td>
+          <td>各県・各市町村の公開GIS（山口・福島・長野・熊本・神奈川・岐阜・富山・福岡ほか9系統）</td>
+        </tr>
+        <tr class="indent">
+          <th scope="row">うち 延長か幅員の値がある</th><td class="n">1,997</td>
+          <td>区分 2,238 ／ 幅員 1,531 ／ 延長 1,996</td>
+        </tr>
+        <tr>
+          <th scope="row">自治体の公表ページ</th><td class="n">1,707</td>
+          <td>市区町村・都道府県・観光協会・公式台帳PDF</td>
+        </tr>
+        <tr class="indent">
+          <th scope="row">うち 規制情報が読める</th><td class="n">323</td>
+          <td>通行止・解除・冬季閉鎖・崩落など。39都道府県に分布</td>
+        </tr>
+        <tr class="indent">
+          <th scope="row">うち 公式台帳の値がある</th><td class="n">132</td>
+          <td>公式の延長 132路線。幅員と舗装延長が付くのは 6路線</td>
+        </tr>
+        <tr>
+          <th scope="row">名指しで探される有名林道</th><td class="n">37</td>
+          <td>正式名が県道・市道のものを含む（例：剣山スーパー林道＝町道剣山線ほか）</td>
+        </tr>
+        <tr>
+          <th scope="row">福井県の林道路網</th><td class="n">1,800</td>
+          <td>福井県 林道路網データ（CC BY 4.0）／ 2,358.8km</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">
+    アプリの「収録状況」画面は<strong>県ごとに数える</strong>ので、県をまたぐ路線が二重に入り、
+    規制情報は 325、台帳の値は 2,130 と表示されます。上の表は路線の実数（重複なし）です。
+    「路線名つきの合計」は、審査に載っているビルドとデータの世代が違うため出していません。
+  </p>
+</section>
+
+<!-- ────────── 被覆率 ────────── -->
+<section class="col" id="coverage">
+  <h2 id="cov-h">47都道府県の被覆率</h2>
+  <p>
+    同梱している林道の距離を、国の統計にある林道延長で割った値です。全国で <strong>44.3%</strong>
+    （同梱 62,060km ÷ 公式 140,190km）。県による差が非常に大きく、
+    <strong>規制情報が1件も無い県もあります</strong>。走る県の濃さを買う前に確かめてください。
+    アプリの「収録状況」画面は無料です。
+  </p>
+  <div class="tablewrap tall" role="region" aria-labelledby="cov-h" tabindex="0">
+    <table>
+      <caption>被覆率の降順。分母は林野庁 森林・林業統計要覧2025 表18 既設林道の現況（令和5年度末）。</caption>
+      <thead>
+        <tr>
+          <th scope="col">都道府県</th><th scope="col">被覆率 %</th>
+          <th scope="col">同梱 km</th><th scope="col">公式 km</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr><th scope="row">北海道</th><td class="n">85.5</td><td class="n">20,619</td><td class="n">24,114</td></tr>
+<tr><th scope="row">群馬県</th><td class="n">83.4</td><td class="n">2,136</td><td class="n">2,561</td></tr>
+<tr><th scope="row">東京都</th><td class="n">73.2</td><td class="n">365</td><td class="n">498</td></tr>
+<tr><th scope="row">青森県</th><td class="n">64.3</td><td class="n">2,712</td><td class="n">4,216</td></tr>
+<tr><th scope="row">埼玉県</th><td class="n">63.5</td><td class="n">573</td><td class="n">903</td></tr>
+<tr><th scope="row">栃木県</th><td class="n">60.7</td><td class="n">1,237</td><td class="n">2,038</td></tr>
+<tr><th scope="row">沖縄県</th><td class="n">56.2</td><td class="n">169</td><td class="n">300</td></tr>
+<tr><th scope="row">長野県</th><td class="n">55.9</td><td class="n">4,027</td><td class="n">7,208</td></tr>
+<tr><th scope="row">福島県</th><td class="n">55.8</td><td class="n">3,265</td><td class="n">5,849</td></tr>
+<tr><th scope="row">神奈川県</th><td class="n">54.7</td><td class="n">374</td><td class="n">683</td></tr>
+<tr><th scope="row">茨城県</th><td class="n">54.0</td><td class="n">657</td><td class="n">1,216</td></tr>
+<tr><th scope="row">静岡県</th><td class="n">53.8</td><td class="n">1,900</td><td class="n">3,535</td></tr>
+<tr><th scope="row">千葉県</th><td class="n">48.8</td><td class="n">326</td><td class="n">669</td></tr>
+<tr><th scope="row">山梨県</th><td class="n">47.7</td><td class="n">1,047</td><td class="n">2,192</td></tr>
+<tr><th scope="row">新潟県</th><td class="n">44.6</td><td class="n">1,580</td><td class="n">3,541</td></tr>
+<tr><th scope="row">秋田県</th><td class="n">44.0</td><td class="n">2,361</td><td class="n">5,366</td></tr>
+<tr><th scope="row">山形県</th><td class="n">42.6</td><td class="n">1,325</td><td class="n">3,110</td></tr>
+<tr><th scope="row">宮崎県</th><td class="n">41.7</td><td class="n">1,973</td><td class="n">4,730</td></tr>
+<tr><th scope="row">高知県</th><td class="n">40.5</td><td class="n">1,691</td><td class="n">4,173</td></tr>
+<tr><th scope="row">熊本県</th><td class="n">37.8</td><td class="n">1,177</td><td class="n">3,109</td></tr>
+<tr><th scope="row">鹿児島県</th><td class="n">37.4</td><td class="n">1,571</td><td class="n">4,199</td></tr>
+<tr><th scope="row">愛知県</th><td class="n">36.3</td><td class="n">621</td><td class="n">1,713</td></tr>
+<tr><th scope="row">鳥取県</th><td class="n">33.3</td><td class="n">469</td><td class="n">1,408</td></tr>
+<tr><th scope="row">岩手県</th><td class="n">32.5</td><td class="n">1,943</td><td class="n">5,982</td></tr>
+<tr><th scope="row">福井県</th><td class="n">31.2</td><td class="n">700</td><td class="n">2,242</td></tr>
+<tr><th scope="row">宮城県</th><td class="n">28.0</td><td class="n">624</td><td class="n">2,230</td></tr>
+<tr><th scope="row">島根県</th><td class="n">26.2</td><td class="n">514</td><td class="n">1,961</td></tr>
+<tr><th scope="row">岐阜県</th><td class="n">25.5</td><td class="n">1,559</td><td class="n">6,113</td></tr>
+<tr><th scope="row">奈良県</th><td class="n">23.6</td><td class="n">258</td><td class="n">1,092</td></tr>
+<tr><th scope="row">大阪府</th><td class="n">21.9</td><td class="n">86</td><td class="n">393</td></tr>
+<tr><th scope="row">大分県</th><td class="n">20.2</td><td class="n">491</td><td class="n">2,431</td></tr>
+<tr><th scope="row">福岡県</th><td class="n">20.0</td><td class="n">390</td><td class="n">1,953</td></tr>
+<tr><th scope="row">京都府</th><td class="n">15.7</td><td class="n">246</td><td class="n">1,567</td></tr>
+<tr><th scope="row">広島県</th><td class="n">15.4</td><td class="n">470</td><td class="n">3,053</td></tr>
+<tr><th scope="row">愛媛県</th><td class="n">15.4</td><td class="n">450</td><td class="n">2,917</td></tr>
+<tr><th scope="row">佐賀県</th><td class="n">14.7</td><td class="n">198</td><td class="n">1,349</td></tr>
+<tr><th scope="row">兵庫県</th><td class="n">13.7</td><td class="n">258</td><td class="n">1,882</td></tr>
+<tr><th scope="row">富山県</th><td class="n">12.6</td><td class="n">229</td><td class="n">1,812</td></tr>
+<tr><th scope="row">三重県</th><td class="n">11.9</td><td class="n">260</td><td class="n">2,180</td></tr>
+<tr><th scope="row">長崎県</th><td class="n">11.9</td><td class="n">185</td><td class="n">1,558</td></tr>
+<tr><th scope="row">和歌山県</th><td class="n">10.7</td><td class="n">214</td><td class="n">2,007</td></tr>
+<tr><th scope="row">滋賀県</th><td class="n">10.5</td><td class="n">135</td><td class="n">1,278</td></tr>
+<tr><th scope="row">徳島県</th><td class="n">9.7</td><td class="n">194</td><td class="n">1,996</td></tr>
+<tr><th scope="row">岡山県</th><td class="n">9.3</td><td class="n">216</td><td class="n">2,322</td></tr>
+<tr><th scope="row">山口県</th><td class="n">6.9</td><td class="n">136</td><td class="n">1,975</td></tr>
+<tr><th scope="row">香川県</th><td class="n">6.1</td><td class="n">28</td><td class="n">465</td></tr>
+<tr><th scope="row">石川県</th><td class="n">4.8</td><td class="n">101</td><td class="n">2,101</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">
+    同梱km は OpenStreetMap と国有林GISを合わせた推定値です。
+    国有林のうち57%はOSMにも線があるため、その分を引いてあります。
+  </p>
+</section>
+
+<!-- ────────── オフライン ────────── -->
+<section class="col" id="offline">
+  <h2>電波の無いところで使う</h2>
+  <p>
+    線形・規制・台帳・出典・引用文は、すべて端末に入っています（55MB）。
+    <strong>路線を引くのに通信は一切しません。</strong>
+    谷筋でアンテナが立たなくても、路線名・規制の記録・管理者の問い合わせ先・
+    取り付き口の座標は出ます。
+  </p>
+  <p>
+    電波が要るのは<strong>地図の背景タイルだけ</strong>です（Apple マップを使っています）。
+    圏外では背景が抜けますが、林道の線・現在地・路線の情報はそのまま読めます。
+  </p>
+  <p class="note">
+    アカウント登録なし・解析なし・広告なし・開発者のサーバーなし。
+    現在地は「近い順」の並べ替えのために端末の中だけで使い、外に出しません。
+  </p>
+</section>
+
+<!-- ────────── 購入と復元 ────────── -->
+<section class="col" id="buy">
+  <h2>購入と復元</h2>
+
+  <h3>無料のまま使える範囲（買っても減りません）</h3>
+  <ul>
+    <li>全国 35,164本の林道の地図・路面の色分け・路線名</li>
+    <li>管理者・問い合わせ先と、路線ごとの<strong>最新の規制情報1件</strong></li>
+    <li>行きたいリストの保存、現在地から近い順の一覧</li>
+    <li>収録状況の画面（県ごとの濃さを買う前に確認できます）</li>
+  </ul>
+
+  <h3>アプリ内課金（買い切り・非消耗型／¥800）で開くもの</h3>
+  <ul>
+    <li>規制の<strong>全履歴と根拠</strong>（無料は最新の1件）</li>
+    <li>台帳の値 — 県の台帳 1,997路線（区分・幅員・延長）と、公式台帳 132路線（延長。幅員と舗装延長は6路線）</li>
+    <li>出典リンクと、その情報がいつ時点のものか</li>
+    <li>検索の絞り込み（ダート・通行止め除外・線のある路線）</li>
+  </ul>
+  <p class="note">
+    月額使用料はかかりません。支払いは App Store（Apple）を通じて処理されます。
+    <strong>価格は App Store の表示が正です。</strong>
+  </p>
+
+  <h3>機種変更・再インストールしたとき</h3>
+  <p>
+    購入は Apple ID に紐づいています。同じ Apple ID でサインインした端末で、
+    アプリの購入画面にある<strong>「購入を復元する」</strong>を押すと、追加の支払いなしで戻ります。
+  </p>
+  <p class="note">
+    復元しても開かないときは、上のサポート窓口へご連絡ください。
+    返金は Apple のサポート（<a href="https://reportaproblem.apple.com/">reportaproblem.apple.com</a>）から
+    申請できます。購入の処理は Apple が行うため、開発者側では返金操作ができません。
+  </p>
+</section>
+
+<!-- ────────── 免責 ────────── -->
+<section class="col" id="disclaimer">
+  <h2>免責事項</h2>
+  <div class="warn">
+    <h3>現地の規制標識・ゲート・管理者の指示が常に優先します</h3>
+    <p>
+      アプリに入っている通行止め・規制の情報は、
+      <strong>自治体・都道府県・林野庁などが公開した情報の転載</strong>であり、
+      過去のある時点の記録です。いま通行できることを保証するものではありません。
+    </p>
+    <p>
+      各情報に付いている「◯年◯月時点」を確認し、走行前に必ず管理者の公式情報で
+      最新の状況を確かめてください。現地で標識・ゲート・管理者の指示と食い違った場合は、
+      <strong>現地の規制が優先</strong>します。
+    </p>
+    <p>
+      林道の走行はご自身の判断と責任で行ってください。
+      本アプリの情報を利用したことによる損害について、開発者は責任を負いかねます。
+    </p>
+    <p class="note">
+      出典のページは消えたり内容が変わったりすることがあります。
+      誤りを見つけた場合はサポート窓口までお知らせください。
+    </p>
+  </div>
+</section>
+
+<!-- ────────── 出典とライセンス ────────── -->
+<section class="col" id="license">
+  <h2>出典とライセンス</h2>
+  <ul>
+    <li>林道の線形・路面: © OpenStreetMap contributors（ODbL 1.0）</li>
+    <li>国有林の路線名・線形: 林野庁 国有林GISデータ 2024年度版（公共データ利用規約 第1.0版・基準時点 2024年4月1日）</li>
+    <li>福井県の林道線形: 福井県 林道路網データ romou_rindou（CC BY 4.0）</li>
+    <li>県の林道台帳: 各県・各市町村が公開しているGISサービス（出典と取得日を路線カードに表示。指摘があれば即時削除します）</li>
+    <li>通行止め・台帳値: 全国の市区町村・都道府県・観光協会の公開情報</li>
+    <li>被覆率の分母: 林野庁 森林・林業統計要覧2025 表18 既設林道の現況（令和5年度末）</li>
+    <li>地図の背景: Apple マップ（MapKit）</li>
+  </ul>
+  <p class="note">各路線カードに主体名・出典URL・取得日を表示しています。</p>
+</section>
+
+<!-- ────────── よくある質問 ────────── -->
+<section class="col" id="faq">
+  <h2>よくある質問</h2>
+
+  <details>
+    <summary>圏外でも使えますか</summary>
+    <p>
+      林道の線・路線名・規制の記録・台帳の値・出典は、すべて端末の中にあるので圏外でも出ます。
+      出ないのは地図の背景（Apple マップのタイル）だけです。
+      あらかじめ走る範囲を表示しておくと、背景も端末に残ることがあります。
+    </p>
+  </details>
+
+  <details>
+    <summary>自分の県が薄いのはなぜですか</summary>
+    <p>
+      規制情報は「自治体がWebで公表しているかどうか」で決まるため、県による差が大きく出ます。
+      線形の被覆率も、OpenStreetMap にどれだけ林道が描かれているかに左右されます。
+      上の表で自分の県の数字を確かめてから購入してください。
+    </p>
+  </details>
+
+  <details>
+    <summary>通行止めの情報は毎日更新されますか</summary>
+    <p>
+      いいえ。データはアプリの更新に合わせて入れ替えます。
+      だからこそ、1件ごとに「いつの情報で、取り込みまで何日たったか」を表示しています。
+      出発前には必ず管理者の公式情報で最新の状況を確かめてください。
+    </p>
+  </details>
+
+  <details>
+    <summary>Android 版はありますか</summary>
+    <p>現在は iPhone 版のみです。</p>
+  </details>
+
+  <details>
+    <summary>情報が間違っています</summary>
+    <p>
+      <a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a> までお知らせください。
+      <strong>路線名とおおよその場所</strong>を添えてもらえると助かります。確認のうえ訂正します。
+      県の台帳の掲載についても、権利者から指摘があれば即時に削除します。
+    </p>
+  </details>
+</section>
+
+<!-- ────────── プライバシー ────────── -->
+<section class="col" id="privacy">
+  <h2>プライバシー</h2>
+  <p>
+    アカウント登録なし・解析なし・広告なし・開発者のサーバーなし。
+    現在地は「近い順」の表示のために端末の中だけで使い、送信しません。
+    詳しくは<a href="privacy.html">プライバシーポリシー</a>をご覧ください。
+  </p>
+</section>
+
+<section class="col" id="guides">
+  <h2>読みもの</h2>
+  <p class="solo"><a href="rindo-ranking.html">林道は全国に何kmある？ 都道府県別ランキング</a></p>
+  <p class="note">林野庁の統計と OpenStreetMap の実測で数えた、都道府県別の総延長・本数・未舗装本数。</p>
+</section>
+</main>
+
+<footer>
+  <p class="links">
+    <a href="index.html">トップ</a>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="rindo-ranking.html">県別ランキング</a>
+    <a href="mailto:nosunosukawa@gmail.com">お問い合わせ</a>
+  </p>
+  <p class="sig">林道ファインダー — 個人開発</p>
+</footer>
+</body>
+</html>

@@ -7,243 +7,164 @@
 <meta name="description" content="通行止めと台帳が引ける林道地図。全国35,164本・44,374kmの線形に、自治体・林野庁の公的情報を出典と日付つきで重ねて表示。データは全部アプリに同梱。">
 <style>
   /* ───────────────────────────────────────────────────────────
-     配色はアプリ本体の theme.ts（2026-08-15 のウォームグレー改修版）を正本にする。
-     ダート #E8590C が主役、青は「押せる」の意味だけ。
-     下地は地形図の質感（等高線）を CSS の repeating-radial-gradient で作る。
-     外部リソースは1つも使わない（GitHub Pages で単体で動くこと）。
+     地は「地図そのものの地形色」。assets/hero-map.jpg の画素を数えて
+     いちばん多かった #E2F0D7（Apple マップの地形の緑）をそのまま使う。
+     道の色は mobile/rindo-finder/src/lib/theme.ts:18,21,24 が正本。
+     文字に使うオレンジだけは、地が緑になったぶん暗くしてある（下のコメント）。
+     外部リソースは1つも読まない。罫線とカードは使わない。
      ─────────────────────────────────────────────────────────── */
   :root{
-    /* 明るい側＝地形図の紙 */
-    --bg:#F4F1EA; --paper:#FFFFFF; --sunk:#EDE9E0;
-    --ink:#1C1915; --body:#45403A; --mute:#6E6659; --faint:#736B60;
-    --line:#DFD8CB; --topo:rgba(28,25,21,.055);
-    --dirt:#B04106;        /* 文字に使う濃さ（地 #F4F1EA・--dirt-bg の上で 4.5:1 を確保） */
-    --dirt-mark:#E8590C;   /* 地図の線と同じ色。面・罫・印に使う */
-    --dirt-bg:#FBEDE2;
-    --paved:#6D7E8E; --unknown:#9AA0A6;
-    --action:#175FA8; --ok:#256F33; --ok-bg:#E9F4EB;
-    --danger:#B02525;
-    --shadow:0 1px 2px rgba(28,25,21,.05), 0 8px 24px -16px rgba(28,25,21,.35);
+    --terrain:#E2F0D7;       /* 地形（ページの地） */
+    --terrain-deep:#CBDDBB;  /* 陰の帯（道具バー・フッター・免責） */
+    --paper:#FFFFFF;         /* 図と引用の面 */
+    --ink:#1C1915;           /* 見出し・数字 白 17.51 / 地 14.74 */
+    --body:#45403A;          /* 本文 白 10.26 / 地 8.63 */
+    --mute:#5E574E;          /* キャプション 白 7.71 / 地 6.49 */
+    --dirt:#E8590C;          /* 未舗装。地図の線と同色。面と印だけ（白 3.58・地 3.01） */
+    --dirt-ink:#983E08;      /* オレンジの文字はこれだけ。3つの地すべてで 4.5:1 を超える濃さ。
+                                白 6.93 / 地 5.83 / 陰の帯 4.82。
+                                theme.ts:19 の #B84A0A は地で 4.39、いちど置いた #A34209 も
+                                陰の帯の上で 4.37 しか出なかったので、ここまで落とした */
+    --focus:#983E08;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#14120F; --paper:#1D1A16; --sunk:#241F1A;
-      --ink:#F2EDE4; --body:#D3CCC0; --mute:#A79E90; --faint:#8E8578;
-      --line:#332C24; --topo:rgba(242,237,228,.05);
-      --dirt:#F2833F; --dirt-mark:#E8590C; --dirt-bg:#2A1B10;
-      --paved:#8496A8; --unknown:#9AA4AD;
-      --action:#7FB3E8; --ok:#68C07A; --ok-bg:#16261A;
-      --danger:#E88080;
-      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+      --terrain:#16200F; --terrain-deep:#24331A; --paper:#14120E;
+      --ink:#F2EEE7;     /* 地 14.56 */
+      --body:#D6CFC4;    /* 地 11.05 */
+      --mute:#B6ADA0;    /* 地 7.83 */
+      --dirt:#E86A1F; --dirt-ink:#FFB183;  /* 地 9.51 */
+      --focus:#FFB183;
     }
   }
 
   *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;color-scheme:light dark}
   body{
-    background:var(--bg);color:var(--body);
-    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,sans-serif;
-    font-size:15.5px;line-height:1.8;-webkit-font-smoothing:antialiased;
-    overflow-x:hidden;overflow-wrap:break-word;
+    background:var(--terrain);color:var(--body);
+    font-family:"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
+    font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased;
+    overflow-wrap:break-word;text-wrap:pretty;
+    touch-action:manipulation;-webkit-tap-highlight-color:rgba(232,89,12,.18);
   }
-  /* 等高線。紙にも墨にも同じ形で乗るよう、色だけトークンで切り替える */
-  body::before{
-    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background-image:
-      repeating-radial-gradient(ellipse 780px 460px at 14% 8%, transparent 0 27px, var(--topo) 27px 28px),
-      repeating-radial-gradient(ellipse 620px 820px at 88% 62%, transparent 0 33px, var(--topo) 33px 34px),
-      repeating-radial-gradient(ellipse 900px 600px at 46% 118%, transparent 0 30px, var(--topo) 30px 31px);
-  }
-  .wrap{max-width:760px;margin:0 auto;padding:0 18px 72px}
+  :focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:2px}
+  [id]{scroll-margin-top:16px}
 
-  a{color:var(--action);font-weight:600;text-decoration:none}
-  a:hover{text-decoration:underline}
-  :focus-visible{outline:2.5px solid var(--dirt-mark);outline-offset:2.5px;border-radius:3px}
-
-  /* ── 上部の道具バー。サポートとプライバシーはスクロールせずに見つかる位置（審査の必須URL） ── */
-  .util{
-    display:flex;flex-wrap:wrap;gap:0 14px;align-items:baseline;
-    padding:2px 0 0;font-size:13px;
+  /* 役割ごとに書体を指名する。読み込みはしない（端末に入っているものだけ） */
+  h1,h2,.brand{
+    font-family:"Avenir Next Condensed","Toppan Bunkyu Midashi Gothic","Hiragino Sans",
+                "Hiragino Kaku Gothic ProN",system-ui,sans-serif;
+    font-weight:700;color:var(--ink);letter-spacing:-.01em;
+    word-break:auto-phrase;line-break:strict;
   }
-  .util .brand{font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-right:auto;padding:10px 0}
-  .util a{font-weight:700;display:inline-block;padding:10px 0}
-
-  /* ── ヒーロー ── */
-  header{padding:26px 0 8px}
-  .eyebrow-app{
-    font-size:11.5px;font-weight:800;letter-spacing:1.2px;color:var(--dirt);
-    margin-bottom:9px;
-  }
-  h1{font-size:34px;line-height:1.15;letter-spacing:-.8px;font-weight:800;color:var(--ink)}
-  .tagline{margin-top:14px;font-size:17px;line-height:1.65;color:var(--body);max-width:34em}
-  .tagline strong{color:var(--ink);font-weight:700}
-
-  /* 数字の帯＝道具のカタログの顔。数値は tabular-nums で桁を揃える */
-  .figures{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
-    margin-top:24px;background:var(--line);
-    border:1px solid var(--line);border-radius:12px;overflow:hidden;
-  }
-  .fig{background:var(--paper);padding:13px 12px 12px}
-  .fig .n{
-    display:block;font-size:23px;font-weight:800;color:var(--ink);
-    letter-spacing:-.6px;line-height:1.15;font-variant-numeric:tabular-nums;
-  }
-  .fig .n .u{font-size:13px;font-weight:700;letter-spacing:0;margin-left:1px}
-  .fig .k{display:block;margin-top:3px;font-size:11.5px;line-height:1.45;color:var(--mute)}
-  @media (max-width:560px){
-    .figures{grid-template-columns:repeat(2,1fr)}
-    h1{font-size:29px}
-  }
-
-  figure{margin:0}
-  .shot-wide{
-    margin-top:22px;border:1px solid var(--line);border-radius:12px;
-    overflow:hidden;background:var(--sunk);box-shadow:var(--shadow);
-  }
-  .shot-wide img{display:block;width:100%;height:auto}
-  .cap{margin-top:8px;font-size:12.5px;line-height:1.6;color:var(--mute)}
-
-  /* ── 節 ── */
-  section{margin-top:44px}
-  h2{
-    font-size:12px;letter-spacing:1.6px;font-weight:800;color:var(--dirt);
-    text-transform:none;margin-bottom:14px;
-    display:flex;align-items:center;gap:9px;
-  }
-  h2::after{content:"";flex:1;height:1px;background:var(--line)}
-  h3{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-.3px;line-height:1.45}
-  h4{font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.5}
-
-  .panel{
-    background:var(--paper);border:1px solid var(--line);border-radius:12px;
-    padding:18px;box-shadow:var(--shadow);
-  }
-  .panel + .panel{margin-top:12px}
-  .panel > * + *{margin-top:9px}
-  .panel p{font-size:15px}
-  .lead-note{color:var(--mute);font-size:13.5px;line-height:1.7}
-  strong{color:var(--ink);font-weight:700}
-
-  /* 路面の色片（アプリの凡例そのまま） */
-  .swatches{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12.5px;color:var(--mute)}
-  .sw{display:flex;align-items:center;gap:6px}
-  .sw i{width:22px;height:4px;border-radius:2px;display:block}
-  .sw.dirt i{background:var(--dirt-mark);height:5px}
-  .sw.paved i{background:var(--paved)}
-  /* opacity を掛けると紙の上で 2:1 を割るので外した。色そのものは地図の凡例と同じ */
-  .sw.unknown i{background:var(--unknown);height:3px}
-
-  /* ── 出典表示の再現（競合との差はここ。アプリの路線画面と同じ形を置く） ── */
-  .repro{
-    background:var(--paper);border:1px solid var(--line);border-radius:12px;
-    padding:16px;box-shadow:var(--shadow);
-  }
-  .repro-tab{
-    font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--faint);
-    text-transform:uppercase;
-  }
-  .fresh{
-    margin-top:10px;background:var(--sunk);border-left:3px solid var(--dirt-mark);
-    border-radius:8px;padding:10px 13px;
-  }
-  .fresh .label{font-size:11px;font-weight:700;color:var(--mute);letter-spacing:.3px}
-  .fresh .row{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:2px}
-  .fresh .date{font-size:19px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
-  .chip{
-    display:inline-block;font-size:11.5px;font-weight:700;line-height:1.6;
-    padding:1px 8px;border-radius:999px;background:var(--ok-bg);color:var(--ok);
+  .cap,.legend text,dt,dd{
+    font-family:"SF Mono",Menlo,"Avenir Next Condensed","Hiragino Sans",ui-monospace,monospace;
     font-variant-numeric:tabular-nums;
   }
-  .kisei{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
-  .kisei span{
-    font-size:12px;font-weight:600;color:var(--dirt);background:var(--dirt-bg);
-    border-radius:6px;padding:2px 9px;
-  }
-  .evidence{
-    margin-top:12px;border:1px solid var(--line);border-radius:9px;padding:13px;
-  }
-  .evidence-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
-  .quote{
-    margin-top:7px;padding-left:11px;border-left:2px solid var(--line);
-    font-size:13.5px;line-height:1.75;color:var(--body);
-  }
-  .srcline{
-    margin-top:9px;font-size:11.5px;color:var(--mute);
-    word-break:break-all;font-variant-numeric:tabular-nums;
-  }
-  .srcline b{color:var(--action);font-weight:700}
-  .repro-foot{margin-top:11px;font-size:12.5px;line-height:1.7;color:var(--mute)}
 
-  /* ── 収録データの表 ── */
-  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper);box-shadow:var(--shadow)}
-  table{border-collapse:collapse;width:100%;min-width:460px;font-size:13.5px}
-  caption{text-align:left;padding:14px 16px 0;font-size:12.5px;color:var(--mute);line-height:1.7}
-  th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-  thead th{
-    font-size:11px;letter-spacing:.6px;color:var(--mute);font-weight:700;
-    background:var(--sunk);border-bottom:1px solid var(--line);white-space:nowrap;
-  }
-  tbody th{font-weight:700;color:var(--ink);white-space:nowrap}
-  td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);white-space:nowrap}
-  tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
-  .t-src{color:var(--mute);font-size:12.5px}
+  a{color:var(--dirt-ink);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+  a:hover{text-decoration-thickness:2px}
 
-  /* ── 画面の並び ── */
-  .shots{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:4px;
-  }
-  .shots figure{min-width:0}
-  .shots img{
-    display:block;width:100%;height:auto;border:1px solid var(--line);
-    border-radius:11px;background:var(--sunk);box-shadow:var(--shadow);
-  }
-  .shots figcaption{margin-top:8px;font-size:12.5px;line-height:1.6;color:var(--mute)}
-  .shots figcaption b{display:block;color:var(--ink);font-weight:700;font-size:13.5px}
-  @media (max-width:620px){ .shots{grid-template-columns:1fr;gap:22px} }
+  /* 文字は細い柱。絵は全幅。ふつうの「カードの中に文字」を裏返している。
+     全面ぶち抜きなので、ノッチ端末の切り欠きぶんを左右に足しておく */
+  .col{max-width:34em;margin:0 auto;
+       padding-left:max(16px, env(safe-area-inset-left));
+       padding-right:max(16px, env(safe-area-inset-right))}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{position:static;display:block;padding:10px 16px;background:var(--paper)}
 
-  /* ── 記事への導線（検索から来た人の受け皿。目立たせる） ── */
-  .article{
-    display:block;background:var(--paper);border:1.5px solid var(--dirt-mark);
-    border-radius:12px;padding:18px;box-shadow:var(--shadow);
-    color:inherit;font-weight:400;
-  }
-  .article:hover{text-decoration:none;background:var(--dirt-bg)}
-  .article .eyebrow{font-size:11px;font-weight:800;letter-spacing:.9px;color:var(--dirt)}
-  .article h3{margin-top:5px}
-  .article p{margin-top:7px;font-size:13.5px;line-height:1.7;color:var(--mute)}
-  .article .go{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:700;color:var(--action)}
+  /* 上の道具バー／下のフッター。リンクは 44px の高さを持つ */
+  .util,footer{background:var(--terrain-deep)}
+  .util{display:flex;flex-wrap:wrap;align-items:center;gap:0 18px;
+        padding-left:max(16px, env(safe-area-inset-left));
+        padding-right:max(16px, env(safe-area-inset-right))}
+  .brand{font-size:15px;margin-right:auto;padding:10px 0}
+  .util a,footer a{display:inline-flex;align-items:center;min-height:44px;font-size:14px}
 
-  ul.plain{list-style:none}
-  ul.plain li{position:relative;padding-left:17px;margin-top:6px;font-size:14.5px;line-height:1.75}
-  ul.plain li::before{
-    content:"";position:absolute;left:0;top:.72em;width:8px;height:2px;
-    border-radius:1px;background:var(--dirt-mark);
-  }
-  ul.disc{padding-left:20px}
-  ul.disc li{margin-top:5px;font-size:14px;line-height:1.7}
+  /* 図は全幅・枠なし・角丸なし。縦長からの切り出しだけ幅を抑える */
+  figure{margin:0}
+  figure img{display:block;width:100%;height:auto}
+  .shot{max-width:940px;margin:0 auto}
 
-  .warn{
-    background:var(--dirt-bg);border:1px solid var(--line);border-left:4px solid var(--dirt-mark);
-    border-radius:10px;padding:16px;
-  }
-  .warn > * + *{margin-top:8px}
-  .warn h3{color:var(--dirt)}
+  /* ヒーロー */
+  h1{font-size:30px;line-height:1.15;margin:22px 0 10px}
+  h1 span{display:inline-block}   /* 文節ごとに包んで、語の途中で折り返させない */
+  .lede p{font-size:16px;color:var(--body)}
+  .figures{max-width:52em}        /* 数字だけは本文より広い箱に置く（折り返させない） */
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:18px 14px;margin:26px 0 34px}
+  .stats div{min-width:0}
+  dt{font-size:34px;line-height:1;font-weight:700;color:var(--ink);letter-spacing:-.02em;
+     white-space:nowrap}
+  dt small{font-size:15px;font-weight:600;margin-left:2px}
+  dd{font-size:11.5px;line-height:1.45;color:var(--mute);letter-spacing:.02em;margin-top:6px}
 
-  .contact{font-size:17px;font-weight:700}
+  /* 凡例。地図の下端に密着した白い帯。中身は中央に寄せる */
+  .legendband{background:var(--paper)}
+  .legend{display:block;width:100%;max-width:420px;margin:0 auto}
+  .legend text{font-size:11px;font-weight:600;fill:var(--ink);letter-spacing:.06em}
 
-  footer{
-    margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
-    text-align:center;font-size:13px;color:var(--mute);
+  section{padding:34px 0 6px}
+  h2{font-size:21px;line-height:1.35;margin:0 0 16px}
+  section p{margin-top:14px}
+  .cap{font-size:12.5px;color:var(--mute);line-height:1.7;margin-top:12px}
+
+  /* 図の面。チャートは白い紙の上に置く（地の緑の上だとバーが 3:1 を割る） */
+  .plot{background:var(--paper);padding:14px 12px;max-width:420px;margin:0 auto}
+  .plot img{width:100%;height:auto;display:block}
+  @media (min-width:720px){ .plot{max-width:800px;padding:18px} }
+
+  /* シグネチャ: 時点スケールバー。地図の縮尺バーの形で、距離ではなく情報の古さを測る */
+  .agebar{display:block;width:100%;max-width:360px;margin:18px auto 0}
+  .agebar .rule{stroke:var(--dirt);stroke-width:1.5;fill:none}
+  .agebar .blk{fill:var(--dirt)}
+  .agebar text{font-family:"SF Mono",Menlo,"Hiragino Sans",ui-monospace,monospace;
+               font-variant-numeric:tabular-nums;fill:var(--mute);font-size:9px}
+  .agebar .end{fill:var(--ink);font-size:9.5px}
+  .agebar .draw{stroke-dasharray:290;stroke-dashoffset:290;animation:draw .6s .15s ease-out forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  /* 免責の帯 */
+  .band{background:var(--terrain-deep);padding:22px 0;margin-top:34px}
+  .band p{margin:0;font-size:14.5px;color:var(--ink)}
+
+  /* 締め。文中でない単独のリンクは 44px を確保する
+     （文のかたまりの中のリンクは WCAG 2.2 Target Size の除外にあたる） */
+  .end-cta{padding:30px 0 8px}
+  .end-cta a.big{display:inline-flex;align-items:center;min-height:44px;font-size:17px}
+  .mail{font-family:"SF Mono",Menlo,ui-monospace,monospace;font-size:14px;word-break:break-all}
+  .mail a{display:inline-flex;align-items:center;min-height:44px}
+  footer{margin-top:30px;
+         padding:6px max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+                   max(16px, env(safe-area-inset-left))}
+  footer .links{display:flex;flex-wrap:wrap;gap:0 18px}
+  footer .sig{font-size:12px;color:var(--mute);padding-top:6px}
+
+  @media (min-width:560px){
+    .stats{grid-template-columns:repeat(4,1fr)}
+    dt{font-size:38px}
   }
-  footer p + p{margin-top:7px}
-  footer .links{display:flex;flex-wrap:wrap;gap:0 16px;justify-content:center}
-  footer .links a{display:inline-block;padding:10px 0}
+  @media (min-width:720px){
+    h1{font-size:52px;margin:34px 0 14px}
+    h2{font-size:30px}
+    body{font-size:17px}
+    .lede p{font-size:18px}
+    dt{font-size:44px}
+    section{padding:52px 0 10px}
+    .agebar{max-width:520px}
+  }
+  /* 広い画面で地図が縦に伸びすぎないよう、帯のまま保つ */
+  @media (min-width:900px){
+    header figure img{max-height:56vh;object-fit:cover;object-position:center 42%}
+  }
 
   @media (prefers-reduced-motion: reduce){
-    *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto !important}
+    .agebar .draw{stroke-dashoffset:0}
   }
 </style>
+<meta name="theme-color" content="#E2F0D7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16200F" media="(prefers-color-scheme: dark)">
 <meta property="og:title" content="林道ファインダー — 通行止めと台帳が引ける林道地図">
 <meta property="og:description" content="全国35,164本の林道の線形に、自治体・林野庁の公的情報を出典と日付つきで重ねて表示。データは全部アプリに同梱。">
 <meta property="og:url" content="https://nosunosukawa.github.io/rindo-finder-site/">
@@ -251,357 +172,156 @@
 <link rel="canonical" href="https://nosunosukawa.github.io/rindo-finder-site/">
 </head>
 <body>
-<div class="wrap">
+<a class="skip" href="#main">本文へ</a>
 
-  <nav class="util" aria-label="サイト内">
-    <span class="brand">林道ファインダー</span>
-    <a href="#support">サポート</a>
-    <a href="privacy.html">プライバシーポリシー</a>
-    <a href="rindo-ranking.html">県別ランキング</a>
-  </nav>
+<nav class="util" aria-label="サイト内">
+  <span class="brand">林道ファインダー</span>
+  <a href="support.html">サポート</a>
+  <a href="privacy.html">プライバシー</a>
+</nav>
 
+<main id="main">
+
+  <!-- ────────── 地図そのもの ────────── -->
   <header>
-    <p class="eyebrow-app">iPhone アプリ「林道ファインダー」</p>
-    <h1>行ってみたら通行止め、を減らす。</h1>
-    <p class="tagline">
-      全国の林道の線形に、自治体・都道府県・林野庁が公表している通行止めと台帳の値を
-      <strong>出典と日付つき</strong>で重ねた地図です。データは全部アプリの中に入っています。
-    </p>
-
-    <div class="figures">
-      <div class="fig">
-        <span class="n">35,164<span class="u">本</span></span>
-        <span class="k">地図に載る林道の線形</span>
-      </div>
-      <div class="fig">
-        <span class="n">44,374<span class="u">km</span></span>
-        <span class="k">その総延長</span>
-      </div>
-      <div class="fig">
-        <span class="n">44.3<span class="u">%</span></span>
-        <span class="k">国の統計の林道延長に対する被覆率</span>
-      </div>
-      <div class="fig">
-        <span class="n">47<span class="u">都道府県</span></span>
-        <span class="k">県ごとの収録数をアプリ内で公開</span>
-      </div>
+    <figure>
+      <img src="assets/hero-map.jpg" width="1200" height="582" fetchpriority="high"
+           alt="林道ファインダーの地図画面。群馬県上野村から秩父にかけての山地に林道の線が重なり、未舗装はオレンジ、舗装は灰青、路面のタグが無いものは薄い灰色で描き分けられている。">
+    </figure>
+    <div class="legendband">
+      <svg class="legend" viewBox="0 0 360 34" role="img"
+           aria-label="線の色の凡例。オレンジが未舗装、灰青が舗装、斜線の入った薄い灰色が路面のタグなし。">
+        <defs>
+          <pattern id="hatch" width="5" height="5" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+            <rect width="5" height="5" fill="#B4BBC2"/>
+            <line x1="0" y1="0" x2="0" y2="5" stroke="#5E574E" stroke-width="1.6"/>
+          </pattern>
+        </defs>
+        <rect x="14" y="14" width="26" height="6" rx="3" fill="#E8590C"/>
+        <text x="46" y="21">未舗装</text>
+        <rect x="106" y="14" width="26" height="6" rx="3" fill="#8496A8"/>
+        <text x="138" y="21">舗装</text>
+        <rect x="184" y="14" width="26" height="6" rx="3" fill="url(#hatch)"/>
+        <text x="216" y="21">タグなし</text>
+      </svg>
     </div>
 
-    <figure class="shot-wide">
-      <img src="assets/map-wide.jpg" width="900" height="784" loading="lazy"
-           alt="林道ファインダーの地図画面。関東山地一帯に林道の線が重なり、未舗装はオレンジ、舗装は灰青で色分けされている。">
-    </figure>
-    <p class="cap">
-      線の色は路面（<span style="color:var(--dirt);font-weight:700">未舗装</span>／舗装／路面不明）、
-      太さは持っている情報の濃さ。上野村・秩父多摩甲斐国立公園のあたり。
-    </p>
-    <div class="swatches">
-      <span class="sw dirt"><i></i>未舗装</span>
-      <span class="sw paved"><i></i>舗装</span>
-      <span class="sw unknown"><i></i>路面不明</span>
+    <div class="col lede">
+      <h1><span>行ってみたら</span><span>通行止め、</span><span>を減らす。</span></h1>
+      <p>全国の林道を地図に。通行止めは、出典と日付ごと出します。</p>
+    </div>
+    <div class="col figures">
+      <dl class="stats">
+        <div><dt>35,164</dt><dd>地図に載る林道</dd></div>
+        <div><dt>44,374<small>km</small></dt><dd>その総延長</dd></div>
+        <div><dt>44.3<small>%</small></dt><dd>国の統計に対する被覆率</dd></div>
+        <div><dt>47</dt><dd>都道府県</dd></div>
+      </dl>
     </div>
   </header>
 
   <!-- ────────── 差になっているところ ────────── -->
-  <section id="sources">
-    <h2>出典と日付が、いつも一緒に出る</h2>
-    <div class="panel">
-      <h3>要約しない。自治体が書いた文をそのまま置く</h3>
-      <p>
-        通行止めの情報は、市区町村・都道府県・観光協会の公開ページから取った
-        <strong>逐語の引用</strong>です。アプリはそれを言い換えません。
-        路線を開くと最初に出るのは「最も新しい公的情報が何年何月何日のもので、いま何日前か」。
-        下は実際の表示（山梨県・林道南アルプス線）を、そのままの形で並べたものです。
-      </p>
+  <section>
+    <div class="col"><h2>通行止めは、要約せずに出す</h2></div>
+    <figure class="shot">
+      <img src="assets/evidence.png" width="948" height="477" loading="lazy"
+           alt="アプリの根拠カード。「冬季通行止め情報／神流町」という見出しに「約3か月前」の印が付き、その下に自治体のページから取った引用文が要約せずそのまま置かれている。御荷鉾スーパー林道の全面通行止めの期間が書かれている。">
+    </figure>
+    <div class="col">
+      <!-- 地図の縮尺バーの形で、距離ではなく情報の古さを測る -->
+      <svg class="agebar" viewBox="0 0 340 58" role="img"
+           aria-label="情報の古さを測る目盛り。2026年4月20日に神流町が更新した情報を、115日後の2026年8月13日に取り込んだ。">
+        <g transform="translate(28,20)">
+          <rect class="blk" x="0" y="0" width="72" height="8"/>
+          <rect class="blk" x="144" y="0" width="72" height="8"/>
+          <path class="rule draw" d="M0 0 H276 M0 8 H276 M0 -5 V13 M276 -5 V13 M72 0 V8 M144 0 V8 M216 0 V8"/>
+          <text x="0" y="-9" text-anchor="middle">0</text>
+          <text x="72" y="-9" text-anchor="middle">30</text>
+          <text x="144" y="-9" text-anchor="middle">60</text>
+          <text x="216" y="-9" text-anchor="middle">90</text>
+          <text x="276" y="-9" text-anchor="end">115日</text>
+          <text class="end" x="0" y="24">2026-04-20 更新</text>
+          <text class="end" x="276" y="24" text-anchor="end">2026-08-13 取込</text>
+        </g>
+      </svg>
+      <p>自治体が書いた文をそのまま置きます。誰がいつ書いたかと、取り込むまでに何日たったかを必ず添えます。</p>
+      <p class="cap">出典: 神流町「冬季通行止め情報」。取得 2026-08-13。掲載は公開情報の転載です。現地の規制標識・ゲート・管理者の指示が常に優先します。</p>
     </div>
+  </section>
 
-    <div class="repro" style="margin-top:12px">
-      <p class="repro-tab">アプリの路線画面と同じ形</p>
+  <!-- ────────── 薄さ ────────── -->
+  <section>
+    <div class="col"><h2>薄いところを、買う前に見せる</h2></div>
+    <div class="plot">
+      <picture>
+        <source media="(min-width:720px)" srcset="assets/coverage-47-wide.svg">
+        <img src="assets/coverage-47.svg" width="358" height="942" loading="lazy"
+             alt="都道府県別の林道被覆率の棒グラフ。降順。北海道85.5%、群馬県83.4%、東京都73.2%と続き、全国平均44.3%の線をはさんで、下は徳島県9.7%、岡山県9.3%、山口県6.9%、香川県6.1%、石川県4.8%まで下がる。">
+      </picture>
+    </div>
+    <div class="col">
+      <p>同梱した距離を国の統計で割った値です。全国で44.3%。石川県は4.8%しかありません。</p>
+      <p class="cap">分母: 林野庁 森林・林業統計要覧2025 表18 既設林道の現況（令和5年度末）。47都道府県の数値表はサポートに載せています。</p>
+    </div>
+  </section>
 
-      <div class="fresh">
-        <p class="label">最も新しい公的情報</p>
-        <p class="row">
-          <span class="date"><time datetime="2026-07-05">2026年7月5日</time></span>
-          <span class="chip">39日前</span>
-        </p>
-      </div>
-
-      <p class="kisei">
-        <span>通行止</span><span>解除</span><span>崩落</span><span>ゲート</span>
-      </p>
-      <p class="repro-foot">
-        出典ページに出てくる規制の語です。いまの状態ではありません（解除と通行止が並ぶことがあります）。
-        下の根拠を日付とあわせて読んでください。
-      </p>
-
-      <div class="evidence">
-        <div class="evidence-head">
-          <h4>南アルプスマイカー規制情報｜早川町役場</h4>
-          <span class="chip">39日前</span>
-        </div>
-        <p class="quote">「…7月11日(土) 5:30に通行規制が解除されました。」</p>
-        <p class="srcline"><b>www.town.hayakawa.yamanashi.jp ↗</b>　2026年7月時点</p>
-      </div>
-
-      <p class="repro-foot">
-        主体（早川町）・出典URL・取得日が路線ごとに付きます。
-        台帳の値も同じ扱いで、山梨県の公式値「延長 19.206km ／ 幅員 3.5〜5.0m」と
-        OpenStreetMap の線形 22.8km の<strong>両方を出します</strong>。片方に寄せません。
-      </p>
+  <!-- ────────── 何が入っているか ────────── -->
+  <section>
+    <div class="col"><h2>何が、どこから、何本</h2></div>
+    <div class="plot">
+      <picture>
+        <source media="(min-width:720px)" srcset="assets/layers-wide.svg">
+        <img src="assets/layers.svg" width="358" height="250" loading="lazy"
+             alt="収録の層と本数の棒グラフ。国有林のGISが12,381路線で全件に林道名あり。県の林道台帳が名前あり4,914路線、うち延長か幅員の値があるのが1,997。自治体の公表ページが1,707路線、うち規制情報が読めるのが323、公式台帳の値があるのが132。">
+      </picture>
+    </div>
+    <div class="col">
+      <p>層ごとに出どころとライセンスを書いています。</p>
     </div>
   </section>
 
   <!-- ────────── オフライン ────────── -->
-  <section id="offline">
-    <h2>電波の無いところで開く前提で作っている</h2>
-    <div class="panel">
-      <h3>林道のデータは全部アプリの中（55MB）</h3>
-      <p>
-        線形・規制・台帳・出典・引用文は、すべて端末に入っています。
-        <strong>路線を引くのに通信は一切しません。</strong>
-        谷筋でアンテナが立たなくても、路線名・規制の記録・管理者の問い合わせ先・
-        取り付き口の座標は出ます。
-      </p>
-      <p class="lead-note">
-        電波が要るのは<strong>地図の背景タイルだけ</strong>です（Apple マップを使っています）。
-        圏外では背景が抜けますが、林道の線・現在地・路線の情報はそのまま読めます。
-      </p>
-      <p class="lead-note">
-        アカウント登録なし・解析なし・広告なし・開発者のサーバーなし。
-        現在地は「近い順」の並べ替えのために端末の中だけで使い、外に出しません。
-      </p>
+  <section>
+    <div class="col"><h2>電波が無い場所で開く</h2></div>
+    <figure class="shot">
+      <img src="assets/search.png" width="900" height="425" loading="lazy"
+           alt="アプリの検索一覧。林道南アルプス線（山梨県・通行止・解除・41日前）、林道井川雨畑線（静岡県・冬季閉鎖・工事・38日前）などが、県名と規制の語と情報の新しさつきで並んでいる。">
+    </figure>
+    <div class="col">
+      <p>この55MBは全部アプリの中にあります。表示に通信はしません。電波が要るのは地図の背景だけです。</p>
     </div>
   </section>
 
-  <!-- ────────── 収録データの内訳 ────────── -->
-  <section id="data">
-    <h2 id="data-h">何が、どこから、何本入っているか</h2>
-    <!-- 横スクロールする領域はキーボードでも動かせる必要がある（2.1.1） -->
-    <div class="tablewrap" role="region" aria-labelledby="data-h" tabindex="0">
-      <table>
-        <caption>2026年8月15日時点の同梱データ。本数は各データファイルの実数です。</caption>
-        <thead>
-          <tr><th scope="col">層</th><th scope="col">本数</th><th scope="col">出どころ</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">下地の線形</th>
-            <td class="num">35,164</td>
-            <td class="t-src">OpenStreetMap（ODbL 1.0）／ 総延長 44,374km</td>
-          </tr>
-          <tr>
-            <th scope="row">国有林の路線</th>
-            <td class="num">12,381</td>
-            <td class="t-src">林野庁 国有林GISデータ 2024年度版（公共データ利用規約 第1.0版）／ 全件に路線名あり</td>
-          </tr>
-          <tr>
-            <th scope="row">県の林道台帳（名前あり）</th>
-            <td class="num">4,914</td>
-            <td class="t-src">各県・各市町村の公開GIS（山口・福島・長野・熊本・神奈川・岐阜ほか）</td>
-          </tr>
-          <tr>
-            <th scope="row">自治体の公表ページ</th>
-            <td class="num">1,707</td>
-            <td class="t-src">市区町村・都道府県・観光協会・公式台帳PDF</td>
-          </tr>
-          <tr>
-            <th scope="row">うち規制情報が読める</th>
-            <td class="num">325</td>
-            <td class="t-src">通行止・解除・冬季閉鎖・崩落など。39都道府県に分布</td>
-          </tr>
-          <tr>
-            <th scope="row">うち台帳の値がある</th>
-            <td class="num">2,130</td>
-            <td class="t-src">延長・幅員・舗装延長・区分</td>
-          </tr>
-          <tr>
-            <th scope="row">名指しで探される有名林道</th>
-            <td class="num">37</td>
-            <td class="t-src">正式名が県道・市道のものを含む（例：剣山スーパー林道＝町道剣山線ほか）</td>
-          </tr>
-          <tr>
-            <th scope="row">福井県の林道路網</th>
-            <td class="num">1,800</td>
-            <td class="t-src">福井県 林道路網データ（CC BY 4.0）／ 2,358.8km</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="panel" style="margin-top:12px">
-      <h3>全国を網羅していません。薄さは購入前に見せます</h3>
-      <p>
-        規制情報は自治体がWebで公表しているかどうかで決まるので、県による偏りが大きく、
-        <strong>記録が0件の県もあります</strong>。国の統計（林野庁 森林・林業統計要覧2025・令和5年度末）の
-        林道延長と比べた被覆率も県ごとに大きく違います。
-      </p>
-      <p>
-        アプリの<strong>「収録状況」画面は無料</strong>です。自分が走る県に何本入っているかを、
-        買う前に必ず確かめてください。
-      </p>
+  <!-- ────────── 買い方 ────────── -->
+  <section>
+    <div class="col">
+      <h2>買い切り800円。月額はなし</h2>
+      <p>地図・路線名・路面の色・最新の規制1件・収録状況は無料です。買うと規制の全履歴と根拠、台帳の値、出典リンクが開きます。</p>
+      <p class="cap">価格は App Store の表示が正です。<a href="support.html#buy">無料と有料の全項目</a></p>
     </div>
   </section>
 
-  <!-- ────────── 画面 ────────── -->
-  <section id="screens">
-    <h2>画面</h2>
-    <div class="shots">
-      <figure>
-        <img src="assets/public.png" width="440" height="956" loading="lazy"
-             alt="御荷鉾スーパー林道の路線画面。最新の公的情報の日付、規制の語、線形の未舗装18.5kmと舗装39.5kmの内訳、根拠の引用が並んでいる。">
-        <figcaption><b>路線</b>日付・規制の語・線形の内訳・根拠の引用。</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/coverage.png" width="440" height="956" loading="lazy"
-             alt="収録状況の画面。県ごとに路線名つきの本数と規制情報の件数、公式延長に対する割合が棒グラフで並んでいる。">
-        <figcaption><b>収録状況</b>県ごとの濃さを購入前に無料で公開。</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/search.png" width="440" height="956" loading="lazy"
-             alt="検索画面。林道南アルプス線など、県名・規制の語・未舗装距離・情報の新しさが並んだ一覧。">
-        <figcaption><b>検索</b>情報の濃い順。路線名・通称・峠・市町村で引ける。</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/route.png" width="440" height="956" loading="lazy"
-             alt="剣山スーパー林道の画面。正式名称が町道剣山線と林道木屋平153号線に割れていること、延長92.7kmのうち未舗装68.7kmであることが表示されている。">
-        <figcaption><b>有名林道</b>通称と正式名称、管理者と問い合わせ先まで。</figcaption>
-      </figure>
-      <figure>
-        <img src="assets/regions.png" width="440" height="956" loading="lazy"
-             alt="県から探す画面。47都道府県について規制・公的・台帳の件数と未舗装が分かる線の本数が一覧になっている。">
-        <figcaption><b>県から探す</b>47都道府県の件数を並べて比べる。</figcaption>
-      </figure>
+  <div class="band">
+    <div class="col">
+      <p>全国は網羅していません。規制情報が読めるのは323本・39都道府県です。</p>
     </div>
-  </section>
+  </div>
 
-  <!-- ────────── 記事 ────────── -->
-  <section id="guides">
-    <h2>読みもの</h2>
-    <a class="article" href="rindo-ranking.html">
-      <span class="eyebrow">記事</span>
-      <h3>林道は全国に何kmある？ 都道府県別ランキング</h3>
-      <p>
-        林野庁の統計と OpenStreetMap の実測で数えた、都道府県別の総延長・本数・未舗装本数。
-        数値はアプリ同梱データの正本から生成しています。
-      </p>
-      <span class="go">記事を読む ›</span>
-    </a>
-  </section>
+  <div class="col end-cta">
+    <p><a class="big" href="support.html">使い方・出典・免責・よくある質問 →</a></p>
+    <p class="mail"><a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a></p>
+  </div>
 
-  <!-- ────────── 課金 ────────── -->
-  <section id="purchase">
-    <h2>購入と復元</h2>
-    <div class="panel">
-      <h3>買い切り1本だけ。サブスクはありません</h3>
-      <p>無料のまま使える範囲は、買っても減りません。</p>
-      <ul class="plain">
-        <li>全国 35,164本の林道の地図・路面の色分け・路線名</li>
-        <li>管理者・問い合わせ先と、路線ごとの<strong>最新の規制情報1件</strong></li>
-        <li>行きたいリストの保存、現在地から近い順の一覧、収録状況の画面</li>
-      </ul>
-      <p style="margin-top:14px">アプリ内課金（買い切り・非消耗型／¥800）を買うと、これが開きます。</p>
-      <ul class="plain">
-        <li>規制の<strong>全履歴と根拠</strong>（無料は最新の1件）</li>
-        <li>台帳の値（延長・幅員・舗装延長・区分）— 2,130路線</li>
-        <li>出典リンクと、その情報がいつ時点のものか</li>
-        <li>検索の絞り込み（ダート・通行止め除外・線のある路線）</li>
-      </ul>
-      <p class="lead-note">
-        月額使用料はかかりません。支払いは App Store（Apple）を通じて処理されます。
-        価格は App Store の表示が正です。
-      </p>
-    </div>
+</main>
 
-    <div class="panel">
-      <h3>機種変更・再インストールしたとき</h3>
-      <p>
-        購入は Apple ID に紐づいています。同じ Apple ID でサインインした端末で、
-        アプリの購入画面にある<strong>「購入を復元する」</strong>を押すと、追加の支払いなしで戻ります。
-      </p>
-      <p class="lead-note">
-        復元しても開かないときは、下のサポート窓口へご連絡ください。
-        返金は Apple のサポート（<a href="https://reportaproblem.apple.com/">reportaproblem.apple.com</a>）から申請できます。
-        購入の処理は Apple が行うため、開発者側では返金操作ができません。
-      </p>
-    </div>
-  </section>
-
-  <!-- ────────── サポート ────────── -->
-  <section id="support">
-    <h2>サポート窓口</h2>
-    <div class="panel">
-      <h3>不具合の報告・情報の訂正</h3>
-      <p class="contact"><a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a></p>
-      <p class="lead-note">
-        個人開発です。全部読みます。返信は1〜2日いただくことがあります。
-        「この林道の情報が違う」という指摘は、<strong>路線名とおおよその場所</strong>を添えてもらえると助かります。
-        確認のうえ訂正します。
-      </p>
-    </div>
-  </section>
-
-  <!-- ────────── 免責 ────────── -->
-  <section id="disclaimer">
-    <h2>免責事項</h2>
-    <div class="warn">
-      <h3>現地の規制標識・ゲート・管理者の指示が常に優先します</h3>
-      <p>
-        アプリに入っている通行止め・規制の情報は、<strong>自治体・都道府県・林野庁などが公開した情報の転載</strong>であり、
-        過去のある時点の記録です。いま通行できることを保証するものではありません。
-      </p>
-      <p>
-        各情報に付いている「◯年◯月時点」を確認し、走行前に必ず管理者の公式情報で最新の状況を確かめてください。
-        現地で標識・ゲート・管理者の指示と食い違った場合は、<strong>現地の規制が優先</strong>します。
-      </p>
-      <p>
-        林道の走行はご自身の判断と責任で行ってください。
-        本アプリの情報を利用したことによる損害について、開発者は責任を負いかねます。
-      </p>
-      <p class="lead-note">
-        出典のページは消えたり内容が変わったりすることがあります。
-        誤りを見つけた場合はサポート窓口までお知らせください。
-      </p>
-    </div>
-  </section>
-
-  <!-- ────────── 出典とライセンス ────────── -->
-  <section id="license">
-    <h2>出典とライセンス</h2>
-    <div class="panel">
-      <ul class="disc">
-        <li>林道の線形・路面: © OpenStreetMap contributors（ODbL 1.0）</li>
-        <li>国有林の路線名・線形: 林野庁 国有林GISデータ 2024年度版（公共データ利用規約 第1.0版・基準時点 2024年4月1日）</li>
-        <li>福井県の林道線形: 福井県 林道路網データ romou_rindou（CC BY 4.0）</li>
-        <li>県の林道台帳: 各県・各市町村が公開しているGISサービス（出典と取得日を路線カードに表示。指摘があれば即時削除します）</li>
-        <li>通行止め・台帳値: 全国の市区町村・都道府県・観光協会の公開情報</li>
-        <li>被覆率の分母: 林野庁 森林・林業統計要覧2025 表18 既設林道の現況（令和5年度末）</li>
-        <li>地図の背景: Apple マップ（MapKit）</li>
-      </ul>
-      <p class="lead-note">各路線カードに主体名・出典URL・取得日を表示しています。</p>
-    </div>
-  </section>
-
-  <!-- ────────── プライバシー ────────── -->
-  <section id="privacy">
-    <h2>プライバシー</h2>
-    <div class="panel">
-      <h3>何も集めません</h3>
-      <p>
-        アカウント登録なし・解析なし・広告なし・開発者のサーバーなし。
-        現在地は「近い順」の表示のために端末の中だけで使い、送信しません。
-        詳しくは<a href="privacy.html">プライバシーポリシー</a>へ。
-      </p>
-    </div>
-  </section>
-
-  <footer>
-    <p class="links">
-      <a href="privacy.html">プライバシーポリシー</a>
-      <a href="mailto:nosunosukawa@gmail.com">サポート窓口</a>
-      <a href="rindo-ranking.html">県別ランキング</a>
-    </p>
-    <p>林道ファインダー — 個人開発</p>
-  </footer>
-</div>
+<footer>
+  <p class="links">
+    <a href="support.html">サポート</a>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="rindo-ranking.html">県別ランキング</a>
+    <a href="mailto:nosunosukawa@gmail.com">お問い合わせ</a>
+  </p>
+  <p class="sig">林道ファインダー — 個人開発</p>
+</footer>
 </body>
 </html>
