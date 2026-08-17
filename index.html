@@ -15,9 +15,9 @@
   :root{
     /* 明るい側＝地形図の紙 */
     --bg:#F4F1EA; --paper:#FFFFFF; --sunk:#EDE9E0;
-    --ink:#1C1915; --body:#45403A; --mute:#6E6659; --faint:#8A8175;
+    --ink:#1C1915; --body:#45403A; --mute:#6E6659; --faint:#736B60;
     --line:#DFD8CB; --topo:rgba(28,25,21,.055);
-    --dirt:#C24A08;        /* 文字に使う濃さ（紙の上で4.5:1を確保） */
+    --dirt:#B04106;        /* 文字に使う濃さ（地 #F4F1EA・--dirt-bg の上で 4.5:1 を確保） */
     --dirt-mark:#E8590C;   /* 地図の線と同じ色。面・罫・印に使う */
     --dirt-bg:#FBEDE2;
     --paved:#6D7E8E; --unknown:#9AA0A6;
@@ -44,7 +44,7 @@
     background:var(--bg);color:var(--body);
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,sans-serif;
     font-size:15.5px;line-height:1.8;-webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
+    overflow-x:hidden;overflow-wrap:break-word;
   }
   /* 等高線。紙にも墨にも同じ形で乗るよう、色だけトークンで切り替える */
   body::before{
@@ -62,11 +62,11 @@
 
   /* ── 上部の道具バー。サポートとプライバシーはスクロールせずに見つかる位置（審査の必須URL） ── */
   .util{
-    display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;
-    padding:12px 0 0;font-size:13px;
+    display:flex;flex-wrap:wrap;gap:0 14px;align-items:baseline;
+    padding:2px 0 0;font-size:13px;
   }
-  .util .brand{font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-right:auto}
-  .util a{font-weight:700}
+  .util .brand{font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-right:auto;padding:10px 0}
+  .util a{font-weight:700;display:inline-block;padding:10px 0}
 
   /* ── ヒーロー ── */
   header{padding:26px 0 8px}
@@ -131,7 +131,8 @@
   .sw i{width:22px;height:4px;border-radius:2px;display:block}
   .sw.dirt i{background:var(--dirt-mark);height:5px}
   .sw.paved i{background:var(--paved)}
-  .sw.unknown i{background:var(--unknown);height:3px;opacity:.75}
+  /* opacity を掛けると紙の上で 2:1 を割るので外した。色そのものは地図の凡例と同じ */
+  .sw.unknown i{background:var(--unknown);height:3px}
 
   /* ── 出典表示の再現（競合との差はここ。アプリの路線画面と同じ形を置く） ── */
   .repro{
@@ -236,7 +237,8 @@
     text-align:center;font-size:13px;color:var(--mute);
   }
   footer p + p{margin-top:7px}
-  footer .links{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center}
+  footer .links{display:flex;flex-wrap:wrap;gap:0 16px;justify-content:center}
+  footer .links a{display:inline-block;padding:10px 0}
 
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
@@ -373,8 +375,9 @@
 
   <!-- ────────── 収録データの内訳 ────────── -->
   <section id="data">
-    <h2>何が、どこから、何本入っているか</h2>
-    <div class="tablewrap">
+    <h2 id="data-h">何が、どこから、何本入っているか</h2>
+    <!-- 横スクロールする領域はキーボードでも動かせる必要がある（2.1.1） -->
+    <div class="tablewrap" role="region" aria-labelledby="data-h" tabindex="0">
       <table>
         <caption>2026年8月15日時点の同梱データ。本数は各データファイルの実数です。</caption>
         <thead>

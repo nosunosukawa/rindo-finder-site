@@ -9,9 +9,9 @@
   /* index.html と同じトークン（アプリ本体 theme.ts が正本）。外部リソースは使わない */
   :root{
     --bg:#F4F1EA; --paper:#FFFFFF; --sunk:#EDE9E0;
-    --ink:#1C1915; --body:#45403A; --mute:#6E6659; --faint:#8A8175;
+    --ink:#1C1915; --body:#45403A; --mute:#6E6659; --faint:#736B60;
     --line:#DFD8CB; --topo:rgba(28,25,21,.055);
-    --dirt:#C24A08; --dirt-mark:#E8590C; --dirt-bg:#FBEDE2;
+    --dirt:#B04106; --dirt-mark:#E8590C; --dirt-bg:#FBEDE2;
     --action:#175FA8;
     --shadow:0 1px 2px rgba(28,25,21,.05), 0 8px 24px -16px rgba(28,25,21,.35);
   }
@@ -30,7 +30,7 @@
   body{
     background:var(--bg);color:var(--body);
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,sans-serif;
-    font-size:15.5px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+    font-size:15.5px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-wrap:break-word;
   }
   body::before{
     content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
@@ -43,9 +43,9 @@
   a:hover{text-decoration:underline}
   :focus-visible{outline:2.5px solid var(--dirt-mark);outline-offset:2.5px;border-radius:3px}
 
-  .util{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:12px 0 0;font-size:13px}
-  .util .brand{font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-right:auto}
-  .util a{font-weight:700}
+  .util{display:flex;flex-wrap:wrap;gap:0 14px;align-items:baseline;padding:2px 0 0;font-size:13px}
+  .util .brand{font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-right:auto;padding:10px 0}
+  .util a{font-weight:700;display:inline-block;padding:10px 0}
 
   header{padding:26px 0 22px}
   .eyebrow-app{font-size:11.5px;font-weight:800;letter-spacing:1.2px;color:var(--dirt);margin-bottom:9px}
@@ -68,9 +68,10 @@
   strong{color:var(--ink);font-weight:700}
 
   footer{
-    margin-top:44px;padding-top:20px;border-top:1px solid var(--line);
+    margin-top:44px;padding-top:12px;border-top:1px solid var(--line);
     text-align:center;font-size:13px;color:var(--mute);
   }
+  footer a{display:inline-block;padding:10px 0}
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
   }
