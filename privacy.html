@@ -6,96 +6,126 @@
 <title>林道ファインダー — プライバシーポリシー</title>
 <meta name="description" content="林道ファインダーは何も収集しません。アカウントなし・解析なし・広告なし・サーバーなし。現在地は端末内でのみ使用します。">
 <style>
-  /* index.html と同じトークン */
+  /* index.html と同じトークン（アプリ本体 theme.ts が正本）。外部リソースは使わない */
   :root{
-    --bg:#F2F6F1; --card:#FFFFFF; --ink:#16281E; --ink-soft:#5C6F63;
-    --accent:#E8590C; --paved:#1971C2; --line:#DCE6DD;
+    --bg:#F4F1EA; --paper:#FFFFFF; --sunk:#EDE9E0;
+    --ink:#1C1915; --body:#45403A; --mute:#6E6659; --faint:#8A8175;
+    --line:#DFD8CB; --topo:rgba(28,25,21,.055);
+    --dirt:#C24A08; --dirt-mark:#E8590C; --dirt-bg:#FBEDE2;
+    --action:#175FA8;
+    --shadow:0 1px 2px rgba(28,25,21,.05), 0 8px 24px -16px rgba(28,25,21,.35);
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#0E1A13; --card:#16281E; --ink:#E7F0E9; --ink-soft:#93A79A;
-      --accent:#F0752F; --paved:#4A9EE0; --line:#24382C;
+      --bg:#14120F; --paper:#1D1A16; --sunk:#241F1A;
+      --ink:#F2EDE4; --body:#D3CCC0; --mute:#A79E90; --faint:#8E8578;
+      --line:#332C24; --topo:rgba(242,237,228,.05);
+      --dirt:#F2833F; --dirt-mark:#E8590C; --dirt-bg:#2A1B10;
+      --action:#7FB3E8;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
     }
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",Roboto,sans-serif;
-    line-height:1.7;padding:24px 20px 64px;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:680px;margin:0 auto}
-  header{margin:20px 0 30px}
-  h1{font-size:28px;line-height:1.2;letter-spacing:-.4px;font-weight:800}
-  .lead{margin-top:14px;font-size:18px;line-height:1.5;font-weight:600}
-  .date{margin-top:10px;font-size:13px;color:var(--ink-soft)}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
-    padding:20px;display:flex;gap:14px;align-items:stretch}
-  .card + .card{margin-top:10px}
-  .pad{width:5px;border-radius:2.5px;flex:none;background:var(--accent)}
-  .body{flex:1}
-  .card h2{font-size:16px;margin-bottom:6px;letter-spacing:-.2px}
-  .card p{font-size:15px}
-  .card p + p{margin-top:8px}
-  a{color:var(--paved);font-weight:600;text-decoration:none}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);color:var(--body);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,sans-serif;
+    font-size:15.5px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+      repeating-radial-gradient(ellipse 780px 460px at 14% 8%, transparent 0 27px, var(--topo) 27px 28px),
+      repeating-radial-gradient(ellipse 620px 820px at 88% 62%, transparent 0 33px, var(--topo) 33px 34px);
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 18px 72px}
+  a{color:var(--action);font-weight:600;text-decoration:none}
   a:hover{text-decoration:underline}
-  footer{margin-top:44px;text-align:center;color:var(--ink-soft);font-size:13px}
+  :focus-visible{outline:2.5px solid var(--dirt-mark);outline-offset:2.5px;border-radius:3px}
+
+  .util{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:12px 0 0;font-size:13px}
+  .util .brand{font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-right:auto}
+  .util a{font-weight:700}
+
+  header{padding:26px 0 22px}
+  .eyebrow-app{font-size:11.5px;font-weight:800;letter-spacing:1.2px;color:var(--dirt);margin-bottom:9px}
+  h1{font-size:28px;line-height:1.25;letter-spacing:-.6px;font-weight:800;color:var(--ink)}
+  .lead{margin-top:14px;font-size:19px;line-height:1.5;font-weight:700;color:var(--ink)}
+  .date{margin-top:10px;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
+
+  .panel{
+    background:var(--paper);border:1px solid var(--line);border-radius:12px;
+    padding:18px;box-shadow:var(--shadow);
+  }
+  .panel + .panel{margin-top:12px}
+  .panel h2{
+    font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.3px;
+    line-height:1.5;margin-bottom:8px;
+    padding-left:11px;border-left:3px solid var(--dirt-mark);
+  }
+  .panel p{font-size:15px}
+  .panel p + p{margin-top:9px}
+  strong{color:var(--ink);font-weight:700}
+
+  footer{
+    margin-top:44px;padding-top:20px;border-top:1px solid var(--line);
+    text-align:center;font-size:13px;color:var(--mute);
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+  }
 </style>
 <link rel="canonical" href="https://nosunosukawa.github.io/rindo-finder-site/privacy.html">
 </head>
 <body>
 <div class="wrap">
+
+  <nav class="util" aria-label="サイト内">
+    <span class="brand">林道ファインダー</span>
+    <a href="index.html">サポート</a>
+    <a href="index.html#support">連絡先</a>
+  </nav>
+
   <header>
+    <p class="eyebrow-app">iPhone アプリ「林道ファインダー」</p>
     <h1>林道ファインダー プライバシーポリシー</h1>
     <p class="lead">何も収集しません。</p>
     <p class="date">2026年8月12日制定・2026年8月15日改定</p>
   </header>
 
-  <div class="card">
-    <div class="pad"></div>
-    <div class="body">
-      <h2>収集するデータ: なし</h2>
-      <p>アカウント登録はありません。氏名・メールアドレス・端末情報を含め、
-         いかなる個人情報も収集・送信しません。</p>
-      <p>解析ツール（アクセス解析・クラッシュレポート）や広告SDKは入っていません。
-         開発者のサーバーも存在しません。</p>
-    </div>
+  <div class="panel">
+    <h2>収集するデータ: なし</h2>
+    <p>アカウント登録はありません。氏名・メールアドレス・端末情報を含め、
+       いかなる個人情報も収集・送信しません。</p>
+    <p>解析ツール（アクセス解析・クラッシュレポート）や広告SDKは入っていません。
+       開発者のサーバーも存在しません。</p>
   </div>
 
-  <div class="card">
-    <div class="pad"></div>
-    <div class="body">
-      <h2>位置情報について</h2>
-      <p>「近い順」の表示と地図上の現在地表示のために、端末の位置情報を利用します。
-         位置情報は<strong>端末の中だけで使い、保存も外部への送信もしません</strong>。</p>
-      <p>位置情報の利用はiOSの許可ダイアログで確認され、iOSの「設定」からいつでも
-         取り消せます。許可しなくても、近い順以外の機能はすべて使えます。</p>
-    </div>
+  <div class="panel">
+    <h2>位置情報について</h2>
+    <p>「近い順」の表示と地図上の現在地表示のために、端末の位置情報を利用します。
+       位置情報は<strong>端末の中だけで使い、保存も外部への送信もしません</strong>。</p>
+    <p>位置情報の利用はiOSの許可ダイアログで確認され、iOSの「設定」からいつでも
+       取り消せます。許可しなくても、近い順以外の機能はすべて使えます。</p>
   </div>
 
-  <div class="card">
-    <div class="pad"></div>
-    <div class="body">
-      <h2>通信について</h2>
-      <p>林道のデータ（線形・規制・台帳・出典）はすべてアプリに同梱されており、
-         表示に通信は使いません。地図の背景タイルの表示にのみ、Apple マップ（MapKit）が
-         Apple のサーバーと通信します。この通信は Apple のプライバシーポリシーに従います。</p>
-    </div>
+  <div class="panel">
+    <h2>通信について</h2>
+    <p>林道のデータ（線形・規制・台帳・出典）はすべてアプリに同梱されており、
+       表示に通信は使いません。地図の背景タイルの表示にのみ、Apple マップ（MapKit）が
+       Apple のサーバーと通信します。この通信は Apple のプライバシーポリシーに従います。</p>
   </div>
 
-  <div class="card">
-    <div class="pad"></div>
-    <div class="body">
-      <h2>購入情報について</h2>
-      <p>アプリ内課金（買い切り）の決済は Apple の App Store が処理します。
-         開発者が購入者の氏名・住所・カード情報などを受け取ることはありません。</p>
-    </div>
+  <div class="panel">
+    <h2>購入情報について</h2>
+    <p>アプリ内課金（買い切り）の決済は Apple の App Store が処理します。
+       開発者が購入者の氏名・住所・カード情報などを受け取ることはありません。</p>
   </div>
 
-  <div class="card">
-    <div class="pad"></div>
-    <div class="body">
-      <h2>お問い合わせ</h2>
-      <p>本ポリシーに関する質問は
-         <a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a> へ。</p>
-    </div>
+  <div class="panel">
+    <h2>お問い合わせ</h2>
+    <p>本ポリシーに関する質問は
+       <a href="mailto:nosunosukawa@gmail.com">nosunosukawa@gmail.com</a> へ。</p>
   </div>
 
   <footer>
