@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ダート（未舗装）の林道が多いのはどこ？ 全国35,164本を路面で数えた</title>
+<meta name="description" content="地図に線のある林道35,164本のうち、未舗装と記録されているのは4,066本（11.6%）だけ。都道府県別の本数と割合、そして「未舗装と書かれていない道の中にダートがある」という数え方の話。">
+<style>
+  /* 配色はトップページ（index.html）と同じトークン */
+  :root{
+    --bg:#F2F6F1; --card:#FFFFFF; --ink:#16281E; --ink-soft:#5C6F63;
+    --accent:#E8590C; --paved:#1971C2; --unknown:#868E96; --closed:#C92A2A; --line:#DCE6DD;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E1A13; --card:#16281E; --ink:#E7F0E9; --ink-soft:#93A79A;
+      --accent:#F0752F; --paved:#4A9EE0; --unknown:#9AA4AD; --closed:#E05252; --line:#24382C;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",Roboto,sans-serif;
+    line-height:1.8;padding:24px 20px 64px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+  header{margin:20px 0 8px}
+  .crumb{font-size:13.5px}
+  h1{font-size:28px;line-height:1.3;letter-spacing:-.4px;font-weight:800;margin-top:10px}
+  .meta{margin-top:8px;font-size:13.5px;color:var(--ink-soft)}
+  h2{font-size:19px;font-weight:800;letter-spacing:-.2px;margin:40px 0 10px}
+  p + p{margin-top:10px}
+  .lead{margin-top:18px;font-size:16.5px}
+  a{color:var(--paved);font-weight:600;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .muted{color:var(--ink-soft);font-size:13.5px;margin-top:10px}
+  .scroll{overflow-x:auto;margin-top:14px;-webkit-overflow-scrolling:touch;
+    border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  table{border-collapse:collapse;min-width:100%;font-size:14.5px;white-space:nowrap}
+  th,td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--line)}
+  thead th{position:sticky;top:0;background:var(--card);font-size:12.5px;
+    color:var(--ink-soft);vertical-align:bottom}
+  tbody th,thead th:nth-child(2){text-align:left}
+  tfoot th{text-align:left}
+  tfoot td,tfoot th{font-weight:800;border-bottom:none;border-top:2px solid var(--line)}
+  td.rank{color:var(--ink-soft);font-size:12.5px}
+  .unit{font-weight:400;font-size:11px}
+  .hint{margin-top:8px;font-size:12.5px;color:var(--ink-soft)}
+  @media (min-width:700px){ .hint{display:none} }
+  @media (max-width:560px){ table{font-size:13px} th,td{padding:6px 9px} }
+  .cta{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;margin-top:40px}
+  .cta h2{margin:0 0 8px;font-size:16px}
+  .cta p{font-size:14.5px}
+  footer{margin-top:44px;text-align:center;color:var(--ink-soft);font-size:13px}
+  footer p + p{margin-top:6px}
+</style>
+<meta property="og:title" content="ダートの林道が多いのはどこ？ 全国35,164本を路面で数えた">
+<meta property="og:description" content="未舗装と記録されているのは全体の11.6%だけ。都道府県別の本数と割合、そして路面が空欄の道の扱い方。">
+<meta property="og:url" content="https://nosunosukawa.github.io/rindo-finder-site/rindo-dirt.html">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://nosunosukawa.github.io/rindo-finder-site/rindo-dirt.html">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Article",
+ "headline": "ダートの林道が多いのはどこ？ 全国35,164本を路面で数えた",
+ "inLanguage": "ja",
+ "datePublished": "2026-08-18",
+ "dateModified": "2026-08-18",
+ "author": {
+  "@type": "Person",
+  "name": "Nobutaka Kawasaki"
+ },
+ "mainEntityOfPage": "https://nosunosukawa.github.io/rindo-finder-site/rindo-dirt.html"
+}
+</script>
+<!-- faq:start（node make-articles.mjs が生成。手で直さない） -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "ダート（未舗装）の林道はどこに多い？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "地図に未舗装と記録されている本数では北海道が2,767本で最多です。次いで静岡県195本、東京都187本、長野県185本、福井県104本。割合で見ると東京都30.7%、北海道30.6%、福井県20.9%の順です。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "日本の林道はほとんど舗装されている？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "いいえ。地図に線のある35,164本のうち未舗装と記録されているのは4,066本（11.6%）ですが、これは路面が地図に書かれていない林道が多いためです。実際に走った記録と突き合わせると、ダートだった林道のうち地図にも未舗装と書かれていたのは1割ほどでした。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "ダートの林道を探すにはどうすればいい？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "地図で未舗装と分かっている4,066本を起点にしつつ、路面が空欄の林道も候補として見る必要があります。路面情報は誰かが書き込んだときだけ付くので、空欄は「舗装」ではなく「不明」です。"
+   }
+  }
+ ]
+}
+</script>
+<!-- faq:end -->
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="crumb"><a href="index.html">林道ファインダー</a> › ガイド</p>
+    <h1>ダート（未舗装）の林道が<br>多いのはどこ？</h1>
+    <p class="meta">地図に線のある全国35,164本を、路面の記録で数えました。本数の順位と、割合で並べ替えたときの入れ替わりを見ます。</p>
+  </header>
+
+  <!-- data:start（node make-articles.mjs が生成。手で直さない） -->
+  <p class="lead">地図（OpenStreetMap）に線が引かれている林道は全国で <strong>35,164本</strong>。
+  そのうち<strong>「未舗装」と記録されているのは 4,066本</strong>で、全体の
+  <strong>11.6%</strong>しかありません。<br>
+  これは「日本の林道の9割が舗装されている」という意味では<strong>ありません</strong>。
+  <strong>路面が地図に書かれていない林道のほうが圧倒的に多い</strong>、という意味です。</p>
+
+  <h2>未舗装の本数が多い都道府県</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>都道府県</th><th>未舗装の本数</th><th>地図上の本数</th><th>割合</th></tr></thead>
+      <tbody>
+        <tr><td class="rank">1</td><th scope="row">北海道</th><td>2,767</td><td>9,045</td><td>30.6%</td></tr>
+        <tr><td class="rank">2</td><th scope="row">静岡県</th><td>195</td><td>1,308</td><td>14.9%</td></tr>
+        <tr><td class="rank">3</td><th scope="row">東京都</th><td>187</td><td>610</td><td>30.7%</td></tr>
+        <tr><td class="rank">4</td><th scope="row">長野県</th><td>185</td><td>2,644</td><td>7.0%</td></tr>
+        <tr><td class="rank">5</td><th scope="row">福井県</th><td>104</td><td>498</td><td>20.9%</td></tr>
+        <tr><td class="rank">6</td><th scope="row">青森県</th><td>91</td><td>1,675</td><td>5.4%</td></tr>
+        <tr><td class="rank">7</td><th scope="row">群馬県</th><td>65</td><td>1,604</td><td>4.1%</td></tr>
+        <tr><td class="rank">8</td><th scope="row">山梨県</th><td>47</td><td>930</td><td>5.1%</td></tr>
+        <tr><td class="rank">9</td><th scope="row">福島県</th><td>46</td><td>2,284</td><td>2.0%</td></tr>
+        <tr><td class="rank">10</td><th scope="row">神奈川県</th><td>44</td><td>360</td><td>12.2%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>割合で見ると、順位が入れ替わる</h2>
+  <p>本数では北海道が圧倒的ですが、<strong>「その県の林道のうち何割が未舗装と分かっているか」</strong>で
+  並べ替えると顔ぶれが変わります（地図上の本数が200本以上の県だけ）。</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>都道府県</th><th>未舗装の割合</th><th>未舗装 / 全体</th></tr></thead>
+      <tbody>
+        <tr><td class="rank">1</td><th scope="row">東京都</th><td>30.7%</td><td>187 / 610</td></tr>
+        <tr><td class="rank">2</td><th scope="row">北海道</th><td>30.6%</td><td>2,767 / 9,045</td></tr>
+        <tr><td class="rank">3</td><th scope="row">福井県</th><td>20.9%</td><td>104 / 498</td></tr>
+        <tr><td class="rank">4</td><th scope="row">静岡県</th><td>14.9%</td><td>195 / 1,308</td></tr>
+        <tr><td class="rank">5</td><th scope="row">神奈川県</th><td>12.2%</td><td>44 / 360</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>「未舗装と書かれていない道」の中にダートがある</h2>
+  <p>地図の路面情報は、その道を歩いた・走った誰かが書き込んだときだけ付きます。
+  だから<strong>書かれていない＝舗装、ではありません</strong>。
+  実際に走った人の記録と突き合わせると、
+  <strong>記録上ダートだった林道のうち、地図にも未舗装と書かれていたのは1割ほど</strong>でした。</p>
+  <p>ダートを探すときは、①地図で未舗装と分かっている 4,066本を起点にしつつ、
+  ②路面が空欄の林道も候補として見る、の両方が要ります。</p>
+  <p class="muted">数え方: 2026-08-13 時点のデータ。本数は OpenStreetMap の way 単位、
+  未舗装は surface タグ（gravel / dirt / ground など）と tracktype から判定。</p>
+<!-- data:end -->
+
+  <div class="cta">
+    <h2>未舗装の色分けで地図から探せるアプリ</h2>
+    <p>iPhoneアプリ「林道ファインダー」は、全国の林道を<strong>路面で色分け</strong>して地図に出します。
+    「ダートだけ」で絞ることもできます。データは端末に同梱なので、電波の無い山の中でも開けます。</p>
+  </div>
+
+  <p class="muted" style="margin-top:28px"><a href="rindo-ranking.html">都道府県別の林道ランキングも見る</a></p>
+
+  <footer>
+    <p><a href="index.html">林道ファインダー</a> — 個人開発</p>
+    <p><a href="privacy.html">プライバシーポリシー</a></p>
+  </footer>
+</div>
+</body>
+</html>

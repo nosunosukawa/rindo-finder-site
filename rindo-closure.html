@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>林道の通行止めはどこで調べる？ 全国1,707路線の公表状況を数えた</title>
+<meta name="description" content="林道の通行止めは自治体のどこに出ているのか。全国で見つかった1,707路線ぶんの公表情報を数え、規制が書かれている割合・県ごとの差・情報の古さ（中央値120日）を実データで示します。">
+<style>
+  /* 配色はトップページ（index.html）と同じトークン */
+  :root{
+    --bg:#F2F6F1; --card:#FFFFFF; --ink:#16281E; --ink-soft:#5C6F63;
+    --accent:#E8590C; --paved:#1971C2; --unknown:#868E96; --closed:#C92A2A; --line:#DCE6DD;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E1A13; --card:#16281E; --ink:#E7F0E9; --ink-soft:#93A79A;
+      --accent:#F0752F; --paved:#4A9EE0; --unknown:#9AA4AD; --closed:#E05252; --line:#24382C;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",Roboto,sans-serif;
+    line-height:1.8;padding:24px 20px 64px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto}
+  header{margin:20px 0 8px}
+  .crumb{font-size:13.5px}
+  h1{font-size:28px;line-height:1.3;letter-spacing:-.4px;font-weight:800;margin-top:10px}
+  .meta{margin-top:8px;font-size:13.5px;color:var(--ink-soft)}
+  h2{font-size:19px;font-weight:800;letter-spacing:-.2px;margin:40px 0 10px}
+  p + p{margin-top:10px}
+  .lead{margin-top:18px;font-size:16.5px}
+  a{color:var(--paved);font-weight:600;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .muted{color:var(--ink-soft);font-size:13.5px;margin-top:10px}
+  .scroll{overflow-x:auto;margin-top:14px;-webkit-overflow-scrolling:touch;
+    border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  table{border-collapse:collapse;min-width:100%;font-size:14.5px;white-space:nowrap}
+  th,td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--line)}
+  thead th{position:sticky;top:0;background:var(--card);font-size:12.5px;
+    color:var(--ink-soft);vertical-align:bottom}
+  tbody th,thead th:nth-child(2){text-align:left}
+  tfoot th{text-align:left}
+  tfoot td,tfoot th{font-weight:800;border-bottom:none;border-top:2px solid var(--line)}
+  td.rank{color:var(--ink-soft);font-size:12.5px}
+  .unit{font-weight:400;font-size:11px}
+  .hint{margin-top:8px;font-size:12.5px;color:var(--ink-soft)}
+  @media (min-width:700px){ .hint{display:none} }
+  @media (max-width:560px){ table{font-size:13px} th,td{padding:6px 9px} }
+  .cta{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;margin-top:40px}
+  .cta h2{margin:0 0 8px;font-size:16px}
+  .cta p{font-size:14.5px}
+  footer{margin-top:44px;text-align:center;color:var(--ink-soft);font-size:13px}
+  footer p + p{margin-top:6px}
+</style>
+<meta property="og:title" content="林道の通行止めはどこで調べる？ 全国1,707路線の公表状況">
+<meta property="og:description" content="自治体が公表している林道情報を数えると、規制が書かれているのは一部だけ。県ごとの差と情報の古さを実データで示します。">
+<meta property="og:url" content="https://nosunosukawa.github.io/rindo-finder-site/rindo-closure.html">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://nosunosukawa.github.io/rindo-finder-site/rindo-closure.html">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Article",
+ "headline": "林道の通行止めはどこで調べる？ 全国1,707路線の公表状況",
+ "inLanguage": "ja",
+ "datePublished": "2026-08-18",
+ "dateModified": "2026-08-18",
+ "author": {
+  "@type": "Person",
+  "name": "Nobutaka Kawasaki"
+ },
+ "mainEntityOfPage": "https://nosunosukawa.github.io/rindo-finder-site/rindo-closure.html"
+}
+</script>
+<!-- faq:start（node make-articles.mjs が生成。手で直さない） -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "林道の通行止めはどこで調べればいい？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "市町村の林務担当・都道府県の林務課・森林管理署の公表ページが一次情報です。ただし全国で見つかった1,707路線のうち、規制が書かれているのは323路線（18.9%）だけで、公表が1本も見つからない県も7県あります。載っていない林道のほうが多いので、迷ったら管理者に電話するのが確実です。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "「通行止め」と書かれていなければ通れる？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "いいえ。公表されていない林道のほうが多いので、記載が無いことは通行できる根拠になりません。逆に「解除」と書かれていても、その情報がいつ時点かを見る必要があります。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "公表されている通行止め情報はどれくらい新しい？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "出典ページに日付が入っていた251路線で数えると、経過日数の中央値は115日でした。90日以内に更新されていたのは118路線で、最も古いものは2011-03-01のページです。"
+   }
+  }
+ ]
+}
+</script>
+<!-- faq:end -->
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="crumb"><a href="index.html">林道ファインダー</a> › ガイド</p>
+    <h1>林道の通行止めは<br>どこで調べる？</h1>
+    <p class="meta">自治体・都道府県が公表している林道の情報を集めて数えました。「調べても出てこない」がなぜ普通なのか、データで示します。</p>
+  </header>
+
+  <!-- data:start（node make-articles.mjs が生成。手で直さない） -->
+  <p class="lead">自治体・都道府県が公表している林道の情報を集めたところ、
+  全国で <strong>1,707路線</strong>ぶんが見つかりました。
+  そのうち通行止めなどの<strong>規制が書かれているのは 323路線</strong>です
+  （18.9%）。<br>
+  つまり<strong>「ネットで探しても、その林道の通行状況は出てこない」ほうが普通</strong>です。</p>
+
+  <h2>公表の熱心さは、県によって桁が違う</h2>
+  <p>公表が1本でも見つかった県は <strong>40県</strong>。
+  残りの <strong>7県</strong>では1本も見つかりませんでした。</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>都道府県</th><th>公表が見つかった路線</th></tr></thead>
+      <tbody>
+        <tr><td class="rank">1</td><th scope="row">福井県</th><td>1,219</td></tr>
+        <tr><td class="rank">2</td><th scope="row">山梨県</th><td>148</td></tr>
+        <tr><td class="rank">3</td><th scope="row">長野県</th><td>49</td></tr>
+        <tr><td class="rank">4</td><th scope="row">北海道</th><td>33</td></tr>
+        <tr><td class="rank">5</td><th scope="row">石川県</th><td>28</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted">※ 見つからなかった県＝その県が何も出していない、とは限りません。
+  こちらが辿れていないだけの可能性もあります。1本も見つからなかった県は隠さずそう書いています。</p>
+
+  <h2>何が書かれているか</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>書かれている内容</th><th>路線数</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">通行止</th><td>203</td></tr>
+        <tr><th scope="row">工事</th><td>175</td></tr>
+        <tr><th scope="row">崩落</th><td>150</td></tr>
+        <tr><th scope="row">解除</th><td>124</td></tr>
+        <tr><th scope="row">伐採</th><td>57</td></tr>
+        <tr><th scope="row">ゲート</th><td>46</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>いちばん大事なのは「いつの情報か」</h2>
+  <p>出典のページに日付が入っていたのは <strong>251路線</strong>ぶん。
+  その日付から数えた経過日数の<strong>中央値は 115日</strong>で、
+  90日以内に更新されていたのは <strong>118路線</strong>でした。
+  いちばん古いものは <strong>2011-03-01</strong> のページです。</p>
+  <p>林道の通行止めは<strong>数日で変わります</strong>。
+  「通行止めと書いていない＝通れる」ではありませんし、
+  「解除と書いてある＝いま通れる」でもありません。
+  日付を必ず見て、迷ったら管理者（市町村の林務担当・森林管理署）に電話するのが確実です。</p>
+  <p class="muted">数え方: 2026-08-13 時点で集めた公開情報。出典・時点はアプリ内の各路線カードに全部出しています。</p>
+<!-- data:end -->
+
+  <div class="cta">
+    <h2>出典と日付ごと、林道ごとに引けるアプリ</h2>
+    <p>この記事の元になっている公表情報は、iPhoneアプリ「林道ファインダー」に
+    <strong>出典リンクと「いつ時点か」つき</strong>で入っています。データは端末に同梱なので、
+    電波の無い山の中でも引けます。</p>
+  </div>
+
+  <p class="muted" style="margin-top:28px"><a href="rindo-ranking.html">都道府県別の林道ランキングも見る</a></p>
+
+  <footer>
+    <p><a href="index.html">林道ファインダー</a> — 個人開発</p>
+    <p><a href="privacy.html">プライバシーポリシー</a></p>
+  </footer>
+</div>
+</body>
+</html>
